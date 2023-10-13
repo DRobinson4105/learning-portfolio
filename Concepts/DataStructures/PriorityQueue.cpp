@@ -4,15 +4,20 @@
 using namespace std;
 
 class PriorityQueue {
+    vector<int> arr;
+    int sizeVal;
+    
     public:
         PriorityQueue() : sizeVal(0) {}
 
+        // Inserts a value into the priority queue
         void enqueue(int value) {
             this->arr.push_back(value);
             this->sizeVal++;
             percUp(this->sizeVal - 1);
         }
 
+        // Returns the value of the front element
         int front() {
             if (this->sizeVal == 0)
                 throw new runtime_error("Attempted to access front value of empty priority queue");
@@ -20,19 +25,19 @@ class PriorityQueue {
             return this->arr[0];
         }
 
+        // Removes the front element
         void dequeue() {
             swap(0, this->sizeVal - 1);
             this->sizeVal--;
             percDown(0);
         }
 
+        // Returns the size of the priority queue
         int size() {
             return this->sizeVal;
         }
+        
     private:
-        vector<int> arr;
-        int sizeVal;
-
         void swap(int index1, int index2) {
             int temp = this->arr[index1];
             this->arr[index1] = this->arr[index2];

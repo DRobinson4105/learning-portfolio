@@ -12,24 +12,31 @@ struct Node {
                 right(nullptr), parent(nullptr) {}
 };
 
-class Tree {
+class AVLTree {
+    Node* root;
+    int sizeVal;
+    
     public:
-        Tree() : root(nullptr), sizeVal(0) {}
+        AVLTree() : root(nullptr), sizeVal(0) {}
 
+        // Inserts a value into the tree
         void insert(int value) {
             this->root = insertNode(this->root, value);
             this->sizeVal++;
         }
 
+        // Removes the first instance of the given value from the tree
         void remove(int value) {
             this->root = removeNode(this->root, value);
             sizeVal--;
         }
 
+        // Returns whether or not the tree contains the given value
         bool includes(int value) {
             return includesNode(this->root, value);
         }
 
+        // Returns a string representation of the tree
         string toString() {
             string res = "[";
             string nodes = getNodes(this->root);
@@ -51,14 +58,12 @@ class Tree {
             return res;
         }
 
+        // Returns the size of the tree
         int size() {
             return this->sizeVal;
         }
 
     private:
-        Node* root;
-        int sizeVal;
-
         Node* insertNode(Node* root, int value) {
         if (root == nullptr) return new Node(value);
 
@@ -238,7 +243,7 @@ class Tree {
 
 
 int main() {
-    Tree* avlTree = new Tree();
+    AVLTree* avlTree = new AVLTree();
     avlTree->insert(1);
     avlTree->insert(2);
     avlTree->insert(3);
