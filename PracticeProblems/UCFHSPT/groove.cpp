@@ -1,4 +1,6 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <stdlib.h>
+
 using namespace std;
 
 int checkFlow(int * notes, int numNotes, int flowLevel);

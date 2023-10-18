@@ -1,4 +1,6 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <iomanip>
 
 //Implement a solution to corgi using DSU
 //Disjoint Set Unions

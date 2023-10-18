@@ -1,4 +1,6 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -12,7 +14,7 @@ int main()
     {
         //make a string vector to store the phrase
         //have the vector store "This song’s gonna get stuck inside yo’"
-        vector <string> phrase {"This", "song's", "gonna", "get", "stuck", "inside", "yo'"};
+        vector<string> phrase {"This", "song's", "gonna", "get", "stuck", "inside", "yo'"};
 
         //Collect the number of times the phrase will be repeated
         int n;
