@@ -5,6 +5,10 @@
 
 using namespace std;
 
+bool on(int mask, int pos) {
+    return (mask & (1 << pos)) > 0;
+}
+
 int set(int mask, int pos) {
     return mask | (1 << pos);
 }
