@@ -31,7 +31,7 @@ class DS {
 };
 
 class Graph {
-    vector<vector<int>> edges;
+    vector<vector<int>> graph;
     int n;
 
     public:
@@ -40,18 +40,18 @@ class Graph {
         }
 
         void addEdge(int a, int b, int weight) {
-            edges.push_back({weight, a, b});
+            graph.push_back({weight, a, b});
         }
 
         int kruskalsMST() {
             DS ds(this->n);
-            sort(edges.begin(), edges.end());
+            sort(graph.begin(), graph.end());
 
             int mstWeight = 0;
-            for (vector<int> edge : edges) {
-                int weight = edge[0];
-                int a = edge[1];
-                int b = edge[2];
+            for (vector<int> vertex : graph) {
+                int weight = vertex[0];
+                int a = vertex[1];
+                int b = vertex[2];
 
                 if (ds.find(a) != ds.find(b)) {
                     ds.merge(a, b);
