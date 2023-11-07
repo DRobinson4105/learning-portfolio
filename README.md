@@ -1,1 +1,0 @@
-A collection of everything I've learned in computer science, including notes, practice problems, and implementations.
