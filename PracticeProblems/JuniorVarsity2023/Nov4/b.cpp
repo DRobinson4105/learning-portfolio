@@ -1,4 +1,7 @@
 #include <iostream>
+#include <iostream>
+#include <list>
+#include <queue>
 #include <vector>
 #include <climits>
 
@@ -6,59 +9,103 @@ using namespace std;
 
 typedef vector<int> vi;
 typedef vector<vi> vvi;
+typedef long long ll;
+typedef pair<ll, ll> pii;
 
 int n, m, f, s, t;
 
-int dfs(vvi roads, int n, bool flightAvailable, vvi flights, int s, int t, vi visited, vi dp) {
-    if (s == t) {
-        return 0;
-    }
-    if (dp[s] != -1) return dp[s];
+class Graph {
+    public:
+        int V, F;
+        list<pii>* adj;
+        
+        Graph(int V, int F) {
+            this->V = V;
+            this->F = F;
+            adj = new list<pii>[V * (F + 1)];
+        }
 
-    int best = INT_MAX;
-    for (int i = 0; i < n; i++) {
-        if (visited[i] || i == s) continue;
+        void addEdge(int u, int v, int w) {
+            adj[u].push_back(make_pair(v, w));
+            adj[v].push_back(make_pair(u, w));
+        }
 
-        visited[i] = 1;
-        if (flightAvailable && flights[s][i])
-            best = min(best, dfs(roads, n, false, flights, i, t, visited, dp));
+        void clone() {
+            for (int f = 1; f <= this->F; f++) {
+                for(int i = 0; i < this->V; i++) {
+                    for (list<pii>::iterator j = this->adj[i].begin(); j != this->adj[i].end(); j++) {
+                        adj[i + f * V].push_back(make_pair((*j).first + f * V, (*j).second));
+                    }
+                }
+            }
+        }
 
-        if (roads[s][i] != INT_MAX)
-            best = min(best, roads[s][i] + dfs(roads, n, flightAvailable, flights, i, t, visited, dp));
+        void addFlight(int f, int u, int v) {
+            adj[u].push_back(make_pair(v + f * V, 0));
+        }
 
-        visited[i] = 0;
-    }
+        ll shortestPath(int src, int t) {
+            priority_queue<pii, vector<pii>, greater<pii>> pq;
+            vector<ll> dist(this->V * (this->F + 1), LONG_LONG_MAX);
 
-    return dp[s] = best;
-}
+            pq.push(make_pair(0, src));
+            dist[src] = 0;
+
+            while (!pq.empty()) {
+                int u = pq.top().second; pq.pop();
+                int k = 0;
+                for (list<pii>::iterator i = adj[u].begin(); i != adj[u].end(); i++) {
+                    int v = (*i).first;
+                    int w = (*i).second;
+
+                    if (dist[v] > dist[u] + w) {
+                        dist[v] = dist[u] + w;
+                        pq.push(make_pair(dist[v], v));
+                    }
+
+                    k++;
+                }
+            }
+
+            ll lowest = dist[t];
+
+            for (int i = 1; i <= F; i++)
+                lowest = min(lowest, dist[t + i * V]);
+
+            return lowest;
+        }
+};
 
 int main() {
     cin >> n >> m >> f >> s >> t;
-
-    vvi roads(n, vi(n, INT_MAX));
-    vvi flights(n, vi(n, 0));
-    vi visited(n, 0);
-    vi dp(n, -1);
+    Graph* graph = new Graph(n, f);
 
     for (int road = 0; road < m; road++) {
         int i, j, c;
         cin >> i >> j >> c;
 
-        int best = c;
-        best = min(roads[i][j], best);
-        best = min(roads[j][i], best);
-        roads[i][j] = roads[j][i] = best;
+        graph->addEdge(i, j, c);
     }
 
-    for (int flight = 0; flight < f; flight++) {
+    graph->clone();
+
+    for (int flight = 1; flight <= f; flight++) {
         int u, v;
         cin >> u >> v;
-        flights[u][v] = 1;
+
+        graph->addFlight(flight, u, v);
     }
 
-    visited[s] = 1;
+    // for (int i = 0; i < graph->V * (graph->F + 1); i++) {
+    //     cout << i << ":" << endl;
+    //     for (list<pii>::iterator j = graph->adj[i].begin(); j != graph->adj[i].end(); j++) {
+    //         cout << (*j).first << " " << (*j).second << endl;
+    //     }
+    //     cout << endl;
+    // }
+    // cout << endl;
 
-    cout << dfs(roads, n, true, flights, s, t, visited, dp) << endl;
+    cout << graph->shortestPath(s, t) << endl;
 
     return 0;
 }
