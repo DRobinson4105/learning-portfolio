@@ -15,7 +15,7 @@ typedef vector<position*> vp;
 typedef pair<double, double> pdd;
 typedef long long ll;
 
-double calcDistance(int x1, int y1, int x2, int y2) {
+double calcDistance(double x1, double y1, double x2, double y2) {
     return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 }
 
@@ -51,7 +51,7 @@ int main() {
     }
 
     int currI = 1;
-    pdd lastPos = make_pair(0, 0);
+    pdd lastPos = make_pair(positions[0]->x, positions[0]->y);
     for (int i = T; i < lastTime; i += T) {
         while (positions[currI]->t < i) currI++;
         pdd nextPos = calcPosition(positions[currI - 1], positions[currI], i);
@@ -63,10 +63,8 @@ int main() {
     gpsDist += calcDistance(lastPos.first, lastPos.second, positions[N - 1]->x, positions[N - 1]->y);
 
     double percent = ((actualDist - gpsDist) / actualDist) * 100;
-    // cout << fixed;
-    // cout << setprecision(5);
-    cout << actualDist << endl;
-    cout << gpsDist << endl;
+    cout << fixed;
+    cout << setprecision(6);
     cout << percent << endl;
     return 0;
 }
