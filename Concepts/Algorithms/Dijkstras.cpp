@@ -33,7 +33,7 @@ class Graph {
             while (!pq.empty()) {
                 int u = pq.top().second; pq.pop();
 
-                for (list<pii>::iterator i = adj[u].begin(); i != adj[u].end(); i++) {
+                for (list<pii>::iterator i = this->adj[u].begin(); i != this->adj[u].end(); i++) {
                     int v = (*i).first;
                     int w = (*i).second;
 
