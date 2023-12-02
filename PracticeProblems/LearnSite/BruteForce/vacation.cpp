@@ -1,45 +1,23 @@
 #include <bits/stdc++.h>
 
+#define INF 1000000
+
 using namespace std;
 
 typedef vector<int> vi;
 typedef vector<vi> vvi;
+typedef vector<double> vd;
+typedef vector<vd> vvd;
 typedef pair<int, int> pii;
 typedef vector<pii> vpii;
 typedef set<pii> spii;
-typedef vector<bool> vb;
-typedef vector<vb> vvb;
 
 double distance(pii a, pii b) {
     return sqrt(pow(a.first - b.first, 2) + pow(a.second - b.second, 2));
 }
 
-double shortestPath(vpii graph, vvb blocked, int n) {
-    vi perm(n - 1);
-    double minPathLength = INT16_MAX;
-
-    for (int i = 0; i < n - 1; i++)
-        perm[i] = i + 1;
-
-    do {
-        double pathLength = 0;
-        int curr = 0;
-
-        for (int next : perm) {
-            if (blocked[curr][next]) {
-                pathLength = INT16_MAX;
-                break;
-            }
-            pathLength += distance(graph[curr], graph[next]);
-            curr = next;
-        }
-        minPathLength = min(minPathLength, pathLength);
-    } while (next_permutation(perm.begin(), perm.end()));
-
-    return minPathLength + 120 * (n - 1);
-}
-
 int main() {
+    cout << setprecision(15);
     int n;
     cin >> n;
 
@@ -47,25 +25,55 @@ int main() {
         int r, b;
         cin >> r >> b;
 
-        vpii graph(r + 1); vvb blocked(r + 1, vb(r + 1, false));
-        graph[0] = {0, 0};
+        vpii rides(r); 
+        spii blocked;
+        vvd graph(r, vd(r, INF));
 
-        for (int i = 1; i <= r; i++)
-            cin >> graph[i].first >> graph[i].second;
-        
+        for (int i = 0; i < r; i++)
+            graph[i][i] = 0;
+
+        for (int i = 0; i < r; i++)
+            cin >> rides[i].first >> rides[i].second;
+
         for (int i = 0; i < b; i++) {
-            int x, y; cin >> x >> y;
-            blocked[x][y] = blocked[y][x] = true;
+            int a, b; cin >> a >> b;
+            blocked.insert({a - 1, b - 1});
         }
-            
-        double sum = shortestPath(graph, blocked, r + 1);
-        sum *= 1000;
-        sum = round(sum);
-        sum /= 1000;
-        if (sum >= INT16_MAX)
-            cout << "Jimmy should plan this vacation a different day." << endl;
+
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < r; j++)
+                if (i != j && blocked.count({i, j}) == 0)
+                    graph[i][j] = distance(rides[i], rides[j]);
+
+        double bestTime = INF;
+        vi perm(r);
+
+        for (int i = 0; i < r; i++)
+            perm[i] = i;
+
+        do {
+            double time = 0;
+            bool validPath = true;
+            int prevRide = 0;
+
+            for (int currRide : perm) {
+                if (graph[prevRide][currRide] == INF) {
+                    validPath = false;
+                    break;
+                }
+
+                time += graph[prevRide][currRide];
+                prevRide = currRide;
+            }
+            time += distance({0, 0}, rides[perm[0]]) + 120 * r;
+            if (validPath) bestTime = min(bestTime, time);
+        } while(next_permutation(perm.begin(), perm.end()));
+        cout << "Vacation #" << (park + 1) << ":" << endl;
+        if (bestTime == INF)
+            cout << "Jimmy should plan this vacation a different day." << endl << endl;
         else
-            cout << "Jimmy can finish all of the rides in " << sum << " seconds." << endl;
+            cout << "Jimmy can finish all of the rides in " << (floor(bestTime * 1000 + 0.5)/1000) << " seconds." << endl << endl;
+
     }
 
     return 0;
