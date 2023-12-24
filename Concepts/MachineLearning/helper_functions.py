@@ -1,25 +1,17 @@
-"""
-A series of helper functions used throughout the course.
-
-If a function gets defined once and could be used over and over, it'll go in here.
-"""
 import torch
+from torch import nn
 import matplotlib.pyplot as plt
 import numpy as np
-
-from torch import nn
-
+from pathlib import Path
+import requests
 import os
 import zipfile
-
-from pathlib import Path
-
-import requests
+from typing import List
+import torchvision
+from torchmetrics.classification import BinaryAccuracy, MulticlassAccuracy
 
 # Walk through an image classification directory and find out how many files (images)
 # are in each subdirectory.
-import os
-
 def walk_through_dir(dir_path):
     """
     Walks through dir_path returning its contents.
@@ -40,9 +32,9 @@ def plot_decision_boundary(model: torch.nn.Module, X: torch.Tensor, y: torch.Ten
 
     Source - https://madewithml.com/courses/foundations/neural-networks/ (with modifications)
     """
-    # Put everything to CPU (works better with NumPy + Matplotlib)
+    # Transfer to CPU
     model.to("cpu")
-    X, y = X.to("cpu"), y.to("cpu")
+    X, y = X.cpu(), y.cpu()
 
     # Setup prediction boundaries and grid
     x_min, x_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
@@ -65,19 +57,14 @@ def plot_decision_boundary(model: torch.nn.Module, X: torch.Tensor, y: torch.Ten
 
     # Reshape preds and plot
     y_pred = y_pred.reshape(xx.shape).detach().numpy()
-    plt.contourf(xx, yy, y_pred, cmap=plt.cm.RdYlBu, alpha=0.7)
-    plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.RdYlBu)
+    plt.contourf(xx, yy, y_pred, cmap=plt.colormaps['RdYlBu'], alpha=0.7)
+    plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.colormaps['RdYlBu'])
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
 
 
 # Plot linear data or training and test and predictions (optional)
-def plot_predictions(
-    train_data, train_labels, test_data, test_labels, predictions=None
-):
-    """
-  Plots linear training data and test data and compares predictions.
-  """
+def plot_predictions(train_data, train_labels, test_data, test_labels, predictions=None):
     plt.figure(figsize=(10, 7))
 
     # Plot training data in blue
@@ -92,39 +79,6 @@ def plot_predictions(
 
     # Show the legend
     plt.legend(prop={"size": 14})
-
-
-# Calculate accuracy (a classification metric)
-def accuracy_fn(y_true, y_pred):
-    """Calculates accuracy between truth labels and predictions.
-
-    Args:
-        y_true (torch.Tensor): Truth labels for predictions.
-        y_pred (torch.Tensor): Predictions to be compared to predictions.
-
-    Returns:
-        [torch.float]: Accuracy value between y_true and y_pred, e.g. 78.45
-    """
-    correct = torch.eq(y_true, y_pred).sum().item()
-    acc = (correct / len(y_pred)) * 100
-    return acc
-
-
-def print_train_time(start, end, device=None):
-    """Prints difference between start and end time.
-
-    Args:
-        start (float): Start time of computation (preferred in timeit format). 
-        end (float): End time of computation.
-        device ([type], optional): Device that compute is running on. Defaults to None.
-
-    Returns:
-        float: time between start and end in seconds (higher is longer).
-    """
-    total_time = end - start
-    print(f"\nTrain time on {device}: {total_time:.3f} seconds")
-    return total_time
-
 
 # Plot loss curves of a model
 def plot_loss_curves(results):
@@ -163,19 +117,64 @@ def plot_loss_curves(results):
     plt.xlabel("Epochs")
     plt.legend()
 
+def train_step(model: torch.nn.Module,
+               dataloader: torch.utils.data.DataLoader,
+               loss_fn: torch.nn.Module,
+               optimizer: torch.optim.Optimizer,
+               device: torch.device = torch.device("cpu")):
+    model.train()
+    
+    # Loop through training batches
+    for X, y in dataloader:
+        # Transfer to GPU
+        X, y = X.to(device), y.to(device)
 
-# Pred and plot image function from notebook 04
-# See creation: https://www.learnpytorch.io/04_pytorch_custom_datasets/#113-putting-custom-image-prediction-together-building-a-function
-from typing import List
-import torchvision
+        # Forward pass
+        y_pred = model(X)
+        
+        # Calculate the loss
+        loss = loss_fn(y_pred, y)
+        
+        # Perform backpropagation on the loss
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
 
+def test_step(model: nn.Module,
+              dataloader: torch.utils.data.DataLoader,
+              loss_fn: nn.Module,
+              accuracy_fn: BinaryAccuracy | MulticlassAccuracy,
+              device: torch.device = torch.device("cpu")):
+    model.eval()
+    test_loss, test_accuracy = 0, 0
+    
+    with torch.inference_mode():
+        # Loop through testing batches
+        for X, y in dataloader:
+            # Transfer to GPU
+            X, y = X.to(device), y.to(device)
+            
+            # Forward pass
+            test_pred = model(X)
+            
+            # Calculate loss and accuracy
+            test_loss += loss_fn(test_pred, y)
+            test_accuracy += accuracy_fn(test_pred.argmax(dim=1), y) * 100
+
+        test_loss /= len(dataloader)
+        test_accuracy /= len(dataloader)
+
+    return {
+        "loss": test_loss,
+        "accuracy": test_accuracy
+    }
 
 def pred_and_plot_image(
     model: torch.nn.Module,
     image_path: str,
-    class_names: List[str] = None,
+    class_names: List[str] = [],
     transform=None,
-    device: torch.device = "cuda" if torch.cuda.is_available() else "cpu",
+    device: torch.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"),
 ):
     """Makes a prediction on a target image with a trained model and plots the image.
 
