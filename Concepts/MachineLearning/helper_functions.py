@@ -6,7 +6,7 @@ from pathlib import Path
 import requests
 import os
 import zipfile
-from typing import List
+from typing import List, Dict
 import torchvision
 from torchmetrics.classification import BinaryAccuracy, MulticlassAccuracy
 
@@ -117,11 +117,15 @@ def plot_loss_curves(results):
     plt.xlabel("Epochs")
     plt.legend()
 
-def train_step(model: torch.nn.Module,
-               dataloader: torch.utils.data.DataLoader,
-               loss_fn: torch.nn.Module,
-               optimizer: torch.optim.Optimizer,
-               device: torch.device = torch.device("cpu")):
+def train_step(
+    model: torch.nn.Module,
+    dataloader: torch.utils.data.DataLoader,
+    loss_fn: torch.nn.Module,
+    optimizer: torch.optim.Optimizer,
+    device: torch.device = torch.device("cpu"),
+    accuracy_fn: BinaryAccuracy | MulticlassAccuracy = None,
+    values: Dict[str, List[float]] = None
+):
     model.train()
     
     # Loop through training batches
@@ -140,11 +144,14 @@ def train_step(model: torch.nn.Module,
         loss.backward()
         optimizer.step()
 
-def test_step(model: nn.Module,
-              dataloader: torch.utils.data.DataLoader,
-              loss_fn: nn.Module,
-              accuracy_fn: BinaryAccuracy | MulticlassAccuracy,
-              device: torch.device = torch.device("cpu")):
+def test_step(
+    model: nn.Module,
+    dataloader: torch.utils.data.DataLoader,
+    loss_fn: nn.Module,
+    accuracy_fn: BinaryAccuracy | MulticlassAccuracy,
+    device: torch.device = torch.device("cpu"),
+    values: Dict[str, List[float]] = None
+):
     model.eval()
     test_loss, test_accuracy = 0, 0
     
