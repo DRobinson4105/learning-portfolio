@@ -27,10 +27,6 @@ ll toLong(string s) {
 int main() {
     ll num; cin >> num;
     getDigits(num);
-    // cout << numDigits << endl;
-    // for (int n : digits) {
-    //     cout << n << " ";
-    // } cout << endl;
     string numStr = to_string(num);
     if (digits.size() == 10) {
         cout << "Impossible" << endl;
@@ -42,8 +38,6 @@ int main() {
     while (digits.count(lowestDigit)) lowestDigit++;
     while (digits.count(highestDigit)) highestDigit--;
     while (digits.count(lowestNonZero)) lowestNonZero++;
-
-    // cout << lowestDigit << " " << highestDigit << endl;
 
     // Lower
     if (numStr[0] != '1' || numStr == "1") {
@@ -58,7 +52,7 @@ int main() {
     for (int i = 0; i < numDigits - 1; i++)
         lowerNum.push_back(highestDigit + '0');
 
-    // Higher
+    // Upper
     bool flag = true;
     if (numStr[0] != '9') {
         for (int i = numStr[0] + 1; i <= '9'; i++) {
@@ -92,6 +86,5 @@ int main() {
     else
         cout << lower << " " << upper << endl;
 
-    // cout << lowerNum << " " << upperNum << endl;
     return 0;
 }
