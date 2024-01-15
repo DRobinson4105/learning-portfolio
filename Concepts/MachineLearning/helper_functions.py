@@ -10,8 +10,6 @@ from typing import List, Dict
 import torchvision
 from torchmetrics.classification import BinaryAccuracy, MulticlassAccuracy
 
-# Walk through an image classification directory and find out how many files (images)
-# are in each subdirectory.
 def walk_through_dir(dir_path):
     """
     Walks through dir_path returning its contents.
@@ -26,6 +24,22 @@ def walk_through_dir(dir_path):
     """
     for dirpath, dirnames, filenames in os.walk(dir_path):
         print(f"There are {len(dirnames)} directories and {len(filenames)} images in '{dirpath}'.")
+
+def multi_class_predictions(model, features, labels, classes, device):
+    torch.manual_seed(42)
+    fig = plt.figure(figsize=(18, 10))
+    rows, cols = 4, 8
+
+    # Get random batch
+    pred = model(features.to(device))
+
+    for i in range(0, 32):
+        img, label = features[i], labels[i]
+        fig.add_subplot(rows, cols, i + 1)
+        plt.imshow(img.squeeze(), cmap="gray")
+        res = "Correct: " + classes[label] + "\nGuess: " + classes[torch.argmax(pred[i])]
+        plt.title(res)
+        plt.axis(False)
 
 def plot_decision_boundary(model: torch.nn.Module, X: torch.Tensor, y: torch.Tensor):
     """Plots decision boundaries of model predicting on X in comparison to y.
