@@ -1,7 +1,4 @@
-#include <iostream>
-#include <list>
-#include <queue>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 

@@ -1,9 +1,11 @@
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
-vector<vector<int> > floydWarshall(vector<vector<int> > graph) {
+typedef vector<int> vi;
+typedef vector<vi> vvi;
+
+vvi floydWarshall(vvi graph) {
     int n = graph.size();
 
     for (int k = 0; k < n; k++)
@@ -19,17 +21,18 @@ int main() {
     int n;
     cin >> n;
 
-    vector<vector<int> > graph(n, vector<int>(n));
+    vvi graph(n, vi(n));
 
     for (int i = 0; i < n; i++)
         for (int j = 0; j < n; j++) 
             cin >> graph[i][j];
 
-    vector<vector<int> > dist = floydWarshall(graph);
+    vvi dist = floydWarshall(graph);
 
-    for (vector<int> row : dist) {
+    for (vi row : dist) {
         for (int cell : row)
             cout << cell << " ";
+            
         cout << endl;
     }
     return 0;
