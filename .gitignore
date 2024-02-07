@@ -1,6 +1,7 @@
 .vscode
 *.txt
 *.out
+*.in
 *.class
 in
 out
