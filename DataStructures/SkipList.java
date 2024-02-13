@@ -94,12 +94,8 @@ public class SkipList {
 
     private void increaseLevel(int level) {
         if (level < height) return;
-        
         height++;
-        addEmptyLevel();
-    }
 
-    private void addEmptyLevel() {
         Node newHead = new Node(NEG_INF);
         Node newTail = new Node(POS_INF);
 
