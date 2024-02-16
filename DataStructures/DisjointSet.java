@@ -1,7 +1,7 @@
-class DS {
+public class DisjointSet {
     int arr[];
 
-    public DS(int n) {
+    public DisjointSet(int n) {
         arr = new int[n];
         for (int i = 0; i < n; i++)
             arr[i] = -1;
