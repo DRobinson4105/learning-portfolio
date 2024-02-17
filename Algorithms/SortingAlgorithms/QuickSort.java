@@ -1,13 +1,16 @@
 import java.util.*;
 
 public class QuickSort {
-    public static void sort(List<Integer> list, int low, int high) {
+    public static void sort(List<Integer> list) {
+        sortHelper(list, 0, list.size()-1);
+    }
+    private static void sortHelper(List<Integer> list, int low, int high) {
         if (low >= high) return;
 
-        int mid = Partition(list, low, high);
+        int mid = partition(list, low, high);
         
-        sort(list, low, mid-1);
-        sort(list, mid+1, high);
+        sortHelper(list, low, mid-1);
+        sortHelper(list, mid+1, high);
     }
 
     private static void swap(List<Integer> list, int i, int j) {
@@ -16,17 +19,17 @@ public class QuickSort {
         list.set(j, tmp);
     }
 
-    private static int Partition(List<Integer> list, int low, int high) {
+    private static int partition(List<Integer> list, int low, int high) {
         int idx = new Random().nextInt(high-low+1) + low;
         swap(list, idx, low);
-        int partition = list.get(low);
+        int p = list.get(low);
         
         int i = low + 1;
         int j = high;
 
         while (i <= j) {
-            while (i <= j && list.get(i) < partition) i++;
-            while (i <= j && list.get(j) >= partition) j--;
+            while (i <= j && list.get(i) < p) i++;
+            while (i <= j && list.get(j) >= p) j--;
 
             if (i < j) swap(list, i, j);
         }
@@ -51,7 +54,7 @@ public class QuickSort {
 
         System.out.println(list);
 
-        RadixSort.sort(list);
+        QuickSort.sort(list);
 
         System.out.println(list);
         System.out.println(isSorted(list));
