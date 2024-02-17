@@ -1,21 +1,22 @@
 import java.util.*;
+import static java.lang.Math.*;
 
 public class RadixSort {
     public static void sort(List<Integer> list) {
         int highestDigit = 0;
         for (Integer num : list) {
-            highestDigit = Math.max(highestDigit, digits(num));
+            highestDigit = max(highestDigit, digits(num));
         }
 
         for (int i = 0; i < highestDigit; i++) {
             final int numDigits = i;
             Collections.sort(list, (Integer a, Integer b) -> {
-                int aDigit = a / (int)Math.pow(10, numDigits), bDigit = b / (int)Math.pow(10, numDigits);
+                int aDigit = a / (int)pow(10, numDigits), bDigit = b / (int)pow(10, numDigits);
                 return aDigit - bDigit;
             });
         }
     }
-    
+
     private static int digits(int num) {
         int digits = 0;
 
