@@ -49,8 +49,7 @@ public class QuickSort {
         List<Integer> list = new ArrayList<>();
         Random r = new Random();
 
-        for (int i = 0; i < 10; i++)
-            list.add(r.nextInt());
+        for (int i = 0; i < 10; i++) list.add(r.nextInt());
 
         System.out.println(list);
 

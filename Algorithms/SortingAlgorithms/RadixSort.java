@@ -11,13 +11,15 @@ public class RadixSort {
         for (int i = 0; i < highestDigit; i++) {
             final int numDigits = i;
             Collections.sort(list, (Integer a, Integer b) -> {
-                int aDigit = a / (int)pow(10, numDigits), bDigit = b / (int)pow(10, numDigits);
+                int aDigit = (a / (int)pow(10, numDigits)) % 10;
+                int bDigit = (b / (int)pow(10, numDigits)) % 10;
                 return aDigit - bDigit;
             });
         }
     }
 
     private static int digits(int num) {
+        num = abs(num);
         int digits = 0;
 
         while (num > 0) {
@@ -38,9 +40,8 @@ public class RadixSort {
     public static void main(String[] args) {
         List<Integer> list = new ArrayList<>();
         Random r = new Random();
-        for (int i = 0; i < 10; i++) {
-            list.add(r.nextInt());
-        }
+        
+        for (int i = 0; i < 10; i++) list.add(r.nextInt());
 
         System.out.println(list);
 
