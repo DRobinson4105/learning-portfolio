@@ -1,16 +1,6 @@
 import java.util.*;
 
 public class RadixSort {
-    private static int digits(int num) {
-        int digits = 0;
-
-        while (num > 0) {
-            num /= 10;
-            digits++;
-        }
-
-        return digits;
-    }
     public static void sort(List<Integer> list) {
         int highestDigit = 0;
         for (Integer num : list) {
@@ -25,7 +15,19 @@ public class RadixSort {
             });
         }
     }
-    public static boolean isSorted(List<Integer> list) {
+    
+    private static int digits(int num) {
+        int digits = 0;
+
+        while (num > 0) {
+            num /= 10;
+            digits++;
+        }
+
+        return digits;
+    }
+
+    private static boolean isSorted(List<Integer> list) {
         for (int i = 1; i < list.size(); i++)
             if (list.get(i) < list.get(i-1)) return false;
 
