@@ -1,4 +1,4 @@
-public class SynchronizedTest {
+public class LockedTest {
     private static Runnable getRunnable(Counter counter) {
         return () -> {
             for (int i = 0; i < 1e6; i++)
@@ -10,15 +10,11 @@ public class SynchronizedTest {
     
     public static void main(String[] args) {
         Counter counter = new Counter();
-        SynchronizedCounter synchronizedCounter = new SynchronizedCounter();
+        LockedCounter lockedCounter = new LockedCounter();
 
-        // Increment method is not synchronized so the increments can run simultaneously which
+        // Increment method does not have a lock so the increments can run simultaneously which
         // would result in the loss of one of the increments
-        // ### read-modify-write race condition ###
-        // both threads read old value
-        // both threads increment the read value
-        // both threads write back the old value + 1
-        System.out.println("Not synchronized:");
+        System.out.println("Without lock:");
         Thread thread1 = new Thread(getRunnable(counter));
         Thread thread2 = new Thread(getRunnable(counter));
 
@@ -29,10 +25,12 @@ public class SynchronizedTest {
             // wait until both threads stop
         }
 
-        // Threads are synchronized so the increments will not run simultaneously
-        System.out.println("Synchronized:");
-        thread1 = new Thread(getRunnable(synchronizedCounter));
-        thread2 = new Thread(getRunnable(synchronizedCounter));
+        // When a thread starts incrementing, it puts a lock on it so all other threads that start
+        // incrementing have to wait for the current thread to unlock it when it finishes
+        // incrementing
+        System.out.println("With lock:");
+        thread1 = new Thread(getRunnable(lockedCounter));
+        thread2 = new Thread(getRunnable(lockedCounter));
 
         thread1.start();
         thread2.start();
