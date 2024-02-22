@@ -1,60 +1,55 @@
-#include <iostream>
-#include <vector>
-#include <stack>
-#include <list>
-
+#include <bits/stdc++.h>
 using namespace std;
 
-void topologicalSortHelper(
-    stack<int>& Stack, list<int> nodes[], 
-    int v, bool visited[]
-) {
-    visited[v] = true;
+typedef vector<int> vi;
+typedef vector<vi> vvi;
 
-    for (list<int>::iterator i = nodes[v].begin(); i != nodes[v].end(); i++)
-        if (!visited[*i])
-            topologicalSortHelper(Stack, nodes, *i, visited);
+bool topSortHelper(stack<int>& s, vvi& graph, int v,
+    vector<bool>& visited, vector<bool>& current) {
+    visited[v] = current[v] = true;
 
-    Stack.push(v);
+    for (int next : graph[v]) if (current[next] || !visited[next] && 
+        !topSortHelper(s, graph, next, visited, current)) return false;
+
+    s.push(v);
+    current[v] = false;
+    return true;
 }
 
-vector<int> topologicalSort(int v, list<int> nodes[]) {
-    stack<int> Stack;
-    vector<int> result;
-
-    bool* visited = new bool[v];
-
-    for (int i = 0; i < v; i++)
-        visited[i] = false;
+vi topSort(int v, vvi& graph) {
+    stack<int> s;
+    vi result;
+    vector<bool> visited(v), current(v);
 
     for (int i = 0; i < v; i++)
-        if (!visited[i])
-            topologicalSortHelper(Stack, nodes, i, visited);
+        if (!visited[i] && !topSortHelper(s, graph, i, visited, current)) return {};
 
-    while (!Stack.empty()) {
-        result.push_back(Stack.top());
-        Stack.pop();
+    while (!s.empty()) {
+        result.push_back(s.top());
+        s.pop();
     }
-
-    delete [] visited;
 
     return result;
 }
 
 int main() {
     int v = 6;
-    list<int>* nodes = new list<int>[6];
-    nodes[5].push_back(2);
-    nodes[5].push_back(0);
-    nodes[4].push_back(0);
-    nodes[4].push_back(1);
-    nodes[2].push_back(3);
-    nodes[3].push_back(1);
+    vvi graph(v);
+    graph[5].push_back(2);
+    graph[2].push_back(0);
+    graph[4].push_back(0);
+    graph[4].push_back(1);
+    graph[2].push_back(3);
+    graph[3].push_back(1);
 
-    vector<int> result = topologicalSort(v, nodes);
-    for (int i = 0; i < result.size(); i++) {
-        cout << result[i] << " ";
-    }
+    vector<int> result = topSort(v, graph);
+    for (int num : result) cout << num << " "; cout << endl;
+    vector<int> answer = {5, 4, 2, 3, 1, 0};
+    assert(result.size() == answer.size());
 
-    cout << endl;
+    for (int i = 0; i < result.size(); i++) assert(result[i] == answer[i]);
+
+    graph[2].push_back(5);
+    result = topSort(v, graph);
+    assert(result.size() == 0);
 }
