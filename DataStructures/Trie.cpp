@@ -1,75 +1,46 @@
 #include <bits/stdc++.h>
 using namespace std;
- 
-struct TrieNode {
-    TrieNode *children[26];
-    bool isEndOfWord;
-    int numWords;
 
-    TrieNode() {
-        this->isEndOfWord = false;
-        this->numWords = 0;
+struct node {
+    bool isWord = false;
+    vector<node*> children;
 
-        for (int i = 0; i < 26; i++)
-            this->children[i] = NULL;
-    }
-};
-
-class Trie {
-    TrieNode* root;
-
-public:
-    Trie() {
-        root = new TrieNode();
+    node() {
+        children = vector<node*>(26, nullptr);
     }
 
-    void insert(string key) {
-        TrieNode* curr = this->root;
-        curr->numWords++;
-    
-        for (char c : key) {
-            int index = c - 'a';
-
-            if (!curr->children[index])
-                curr->children[index] = new TrieNode();
-    
-            curr = curr->children[index];
-            curr->numWords++;
+    void insert(string &s, int idx) {
+        if (idx == s.size()) {
+            isWord = true;
+            return;
         }
-    
-        curr->isEndOfWord = true;
+
+        if (!children[s[idx]-'a']) children[s[idx]-'a'] = new node();
+        children[s[idx]-'a']->insert(s, idx+1);
     }
 
-    bool search(string key) {
-        TrieNode* curr = this->root;
-    
-        for (char c : key) {
-            int index = c - 'a';
-            if (!curr->children[index])
-                return false;
-    
-            curr = curr->children[index];
-        }
-    
-        return curr->isEndOfWord;
+
+    bool search(string &s, int idx) {
+        if (idx == s.size()) return isWord;
+        if (!children[s[idx]-'a']) return false;
+        return children[s[idx]-'a']->search(s, idx+1);
     }
 };
 
 int main() {
-    string keys[] = {"the", "a", "there",
-                    "answer", "any", "by",
-                     "bye", "their" };
+    string keys[] = {"the", "a", "there", "answer", "any", "by", "bye", "their"};
+    pair<string, bool> words[] = {{"the", true}, {"these", false}, {"their", true}, {"thaw", false}};
  
-    Trie* trie = new Trie();
+    node* root = new node();
  
     for (string key : keys)
-        trie->insert(key);
+        root->insert(key, 0);
  
     char output[][32] = {"Not present in trie", "Present in trie"};
- 
-    cout<<"the"<<" --- "<<output[trie->search("the")]<<endl;
-    cout<<"these"<<" --- "<<output[trie->search("these")]<<endl;
-    cout<<"their"<<" --- "<<output[trie->search("their")]<<endl;
-    cout<<"thaw"<<" --- "<<output[trie->search("thaw")]<<endl;
+    
+    for (auto [word, inTrie] : words) {
+        assert(!(root->search(word, 0) ^ inTrie));
+    }
+
     return 0;
 }

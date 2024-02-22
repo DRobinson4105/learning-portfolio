@@ -1,46 +1,45 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
-typedef pair<int, int> pii;
+typedef long long ll;
+typedef pair<ll, int> pli;
+ll INF = 1e15;
 
-class Graph {
-    int V;
+vector<ll> dijkstras(vector<vector<pair<int, ll>>>& graph, int n, int src) {
+    priority_queue<pli, vector<pli>, greater<pli>> pq;
+    vector<ll> dist(n, INF);
 
-    list<pii>* adj;
+    pq.push(make_pair(0, src));
+    dist[src] = 0;
 
-    public:
-        Graph(int V) {
-            this->V = V;
-            adj = new list<pii>[V];
-        }
+    while (!pq.empty()) {
+        int u = pq.top().second; pq.pop();
 
-        void addEdge(int u, int v, int w) {
-            adj[u].push_back(make_pair(v, w));
-            adj[v].push_back(make_pair(u, w));
-        }
-
-        vector<int> shortestPath(int src) {
-            priority_queue<pii, vector<pii>, greater<pii>> pq;
-            vector<int> dist(this->V, INT_MAX);
-
-            pq.push(make_pair(0, src));
-            dist[src] = 0;
-
-            while (!pq.empty()) {
-                int u = pq.top().second; pq.pop();
-
-                for (list<pii>::iterator i = this->adj[u].begin(); i != this->adj[u].end(); i++) {
-                    int v = (*i).first;
-                    int w = (*i).second;
-
-                    if (dist[v] > dist[u] + w) {
-                        dist[v] = dist[u] + w;
-                        pq.push(make_pair(dist[v], v));
-                    }
-                }
+        for (auto [v, w]: graph[u]) {
+            if (dist[v] > dist[u] + w) {
+                dist[v] = dist[u] + w;
+                pq.push(make_pair(dist[v], v));
             }
-
-            return dist;
         }
-};
+    }
+
+    return dist;
+}
+
+
+
+int main() {
+    vector<vector<pair<int, ll>>> graph = {
+        {{1, 2}, {2, 4}},
+        {{3, 7}},
+        {{3, 1}},
+        {{4, 3}},
+        {}
+    };
+
+    vector<ll> dist = dijkstras(graph, 5, 0);
+
+    for (ll num : dist) cout << num << " ";
+    cout << endl;
+    // answer should be 0 2 4 5 8
+}
