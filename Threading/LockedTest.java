@@ -9,8 +9,8 @@ public class LockedTest {
     }
     
     public static void main(String[] args) {
-        Counter counter = new Counter();
-        LockedCounter lockedCounter = new LockedCounter();
+        Counter counter = Counters.createBasicCounter();
+        Counter lockedCounter = Counters.createLockedCounter();
 
         // Increment method does not have a lock so the increments can run simultaneously which
         // would result in the loss of one of the increments

@@ -9,8 +9,8 @@ public class SynchronizedTest {
     }
     
     public static void main(String[] args) {
-        Counter counter = new Counter();
-        SynchronizedCounter synchronizedCounter = new SynchronizedCounter();
+        Counter counter = Counters.createBasicCounter();
+        Counter synchronizedCounter = Counters.createSynchronizedCounter();
 
         // Increment method is not synchronized so the increments can run simultaneously which
         // would result in the loss of one of the increments
