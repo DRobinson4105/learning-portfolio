@@ -4,31 +4,29 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 
-bool topSortHelper(stack<int>& s, vvi& graph, int v,
-    vector<bool>& visited, vector<bool>& current) {
-    visited[v] = current[v] = true;
-
-    for (int next : graph[v]) if (current[next] || !visited[next] && 
-        !topSortHelper(s, graph, next, visited, current)) return false;
-
-    s.push(v);
-    current[v] = false;
-    return true;
-}
-
-vi topSort(int v, vvi& graph) {
-    stack<int> s;
+vi topSort(vvi graph, int v){
+    vi inDegree(v, 0);
+    int count = 0;
     vi result;
-    vector<bool> visited(v), current(v);
+    queue<int> q;
+
+    for (vi outgoing : graph)
+        for (int next : outgoing)
+            inDegree[next]++;
 
     for (int i = 0; i < v; i++)
-        if (!visited[i] && !topSortHelper(s, graph, i, visited, current)) return {};
-
-    while (!s.empty()) {
-        result.push_back(s.top());
-        s.pop();
+        if (inDegree[i] == 0) q.push(i);
+ 
+    while (!q.empty()) {
+        int curr = q.front(); q.pop();
+        result.push_back(curr);
+        count++;
+    
+        for (int next : graph[curr])
+            if (--inDegree[next] == 0) q.push(next);
     }
-
+ 
+    if (count != v) return {};
     return result;
 }
 
@@ -41,8 +39,11 @@ int main() {
     graph[4].push_back(1);
     graph[2].push_back(3);
     graph[3].push_back(1);
+    graph[5].push_back(4);
+    graph[4].push_back(2);
+    graph[1].push_back(0);
 
-    vector<int> result = topSort(v, graph);
+    vector<int> result = topSort(graph, v);
     for (int num : result) cout << num << " "; cout << endl;
     vector<int> answer = {5, 4, 2, 3, 1, 0};
     assert(result.size() == answer.size());
@@ -50,6 +51,6 @@ int main() {
     for (int i = 0; i < result.size(); i++) assert(result[i] == answer[i]);
 
     graph[2].push_back(5);
-    result = topSort(v, graph);
+    result = topSort(graph, v);
     assert(result.size() == 0);
 }
