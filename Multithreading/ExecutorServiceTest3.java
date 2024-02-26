@@ -29,6 +29,7 @@ public class ExecutorServiceTest3 {
                 return "Failed task";
             }).toList());
         } catch (InterruptedException e) {}
+        
         executorService.shutdown();
     }
 }
