@@ -1,141 +1,139 @@
 import java.util.*;
 import java.io.*;
 
-class Node {
-	private static final int ORDER = 4;
-	private int numItems;
-	private Node parent;
-	private Node children[] = new Node[ORDER];
-	private Integer items[] = new Integer[ORDER - 1];
-
-	// connect child to this node
-	public void connectChild(int index, Node child) {
-		children[index] = child;
-		if (child != null) child.parent = this;
-	}
-
-	// disconnect child from this node and return
-	public Node disconnectChild(int index) {
-		Node tempNode = children[index];
-		children[index] = null;
-		return tempNode;
-	}
-
-	public Node getChild(int index) {
-		return children[index];
-	}
-
-	public Node getParent() {
-		return parent;
-	}
-
-	public boolean isLeaf() {
-		return (children[0] == null) ? true : false;
-	}
-
-	public int getNumItems() {
-		return numItems;
-	}
-
-	public void setNumItems(int val) {
-		numItems = val;
-		return;
-	}
-
-	public Integer getItem(int index) {
-		return items[index];
-	}
-
-	public Integer setItem(int index, Integer val) {
-		items[index] = val;
-		return items[index];
-	}
-
-	public boolean isFull() {
-		return numItems == ORDER - 1;
-	}
-
-	public int insertItem(Integer item) {
-		numItems++;
-
-		for (int i = ORDER - 2; i >= 0; i--) {
-			if (items[i] == null) continue;
-			else {
-				if (item < items[i])
-					items[i + 1] = items[i];
+public class TwoFourTree {
+	static class Node {
+		private static final int ORDER = 4;
+		private int numItems;
+		private Node parent;
+		private Node children[] = new Node[ORDER];
+		private Integer items[] = new Integer[ORDER - 1];
+	
+		// connect child to this node
+		public void connectChild(int index, Node child) {
+			children[index] = child;
+			if (child != null) child.parent = this;
+		}
+	
+		// disconnect child from this node and return
+		public Node disconnectChild(int index) {
+			Node tempNode = children[index];
+			children[index] = null;
+			return tempNode;
+		}
+	
+		public Node getChild(int index) {
+			return children[index];
+		}
+	
+		public Node getParent() {
+			return parent;
+		}
+	
+		public boolean isLeaf() {
+			return (children[0] == null) ? true : false;
+		}
+	
+		public int getNumItems() {
+			return numItems;
+		}
+	
+		public void setNumItems(int val) {
+			numItems = val;
+			return;
+		}
+	
+		public Integer getItem(int index) {
+			return items[index];
+		}
+	
+		public Integer setItem(int index, Integer val) {
+			items[index] = val;
+			return items[index];
+		}
+	
+		public boolean isFull() {
+			return numItems == ORDER - 1;
+		}
+	
+		public int insertItem(Integer item) {
+			numItems++;
+	
+			for (int i = ORDER - 2; i >= 0; i--) {
+				if (items[i] == null) continue;
 				else {
-					items[i + 1] = item;
-					return i + 1;
+					if (item < items[i])
+						items[i + 1] = items[i];
+					else {
+						items[i + 1] = item;
+						return i + 1;
+					}
 				}
 			}
+	
+			items[0] = item;
+			return 0;
 		}
-
-		items[0] = item;
-		return 0;
-	}
-
-	public void insertAtFront(Integer item) {
-		numItems++;
-		for (int i = numItems - 1; i > 0; i--) {
-			items[i] = items[i - 1];
-			connectChild(i + 1, disconnectChild(i));
-		}
-
-		connectChild(1, disconnectChild(0));
-		items[0] = item;
-		connectChild(0, null);
-
-		return;
-	}
-
-	public Integer removeItem() {
-		Integer temp = items[numItems - 1];
-		items[numItems - 1] = null;
-		numItems--;
-		return temp;
-	}
-
-	public void displayNode() {
-		for (int i = 0; i < numItems; i++)
-			System.out.print(items[i] + ", ");
-	}
-
-	public void displayValue(int index) {
-        System.out.println(items[index]);
-	}
-
-	public void deleteValue(int val) {
-		int flag = -1;
-		for (int i = 0; i < numItems; i++) {
-			if (val == items[i]) flag = i;
-
-			if (flag != -1 && i + 1 < numItems) {
-				items[i] = items[i + 1];
+	
+		public void insertAtFront(Integer item) {
+			numItems++;
+			for (int i = numItems - 1; i > 0; i--) {
+				items[i] = items[i - 1];
+				connectChild(i + 1, disconnectChild(i));
 			}
+	
+			connectChild(1, disconnectChild(0));
+			items[0] = item;
+			connectChild(0, null);
+	
+			return;
 		}
-		items[--numItems] = null;
-	}
-
-	public Node getSibling(int val) {
-		Node x = null;
-		Node p = getParent();
-		if (numItems != 0) {
-			for (int i = 0; i <= p.numItems; i++) {
-				if (p.children[i].items[0] < val)
-					x = p.children[i];
-			}
-		} else if (numItems == 0) {
-			for (int i = 0; i <= p.numItems; i++) {
-				if (p.children[i].items[0] == null && i != 0)
-					x = p.children[i - 1];
-			}
+	
+		public Integer removeItem() {
+			Integer temp = items[numItems - 1];
+			items[numItems - 1] = null;
+			numItems--;
+			return temp;
 		}
-		return x;
+	
+		public void displayNode() {
+			for (int i = 0; i < numItems; i++)
+				System.out.print(items[i] + ", ");
+		}
+	
+		public void displayValue(int index) {
+			System.out.println(items[index]);
+		}
+	
+		public void deleteValue(int val) {
+			int flag = -1;
+			for (int i = 0; i < numItems; i++) {
+				if (val == items[i]) flag = i;
+	
+				if (flag != -1 && i + 1 < numItems) {
+					items[i] = items[i + 1];
+				}
+			}
+			items[--numItems] = null;
+		}
+	
+		public Node getSibling(int val) {
+			Node x = null;
+			Node p = getParent();
+			if (numItems != 0) {
+				for (int i = 0; i <= p.numItems; i++) {
+					if (p.children[i].items[0] < val)
+						x = p.children[i];
+				}
+			} else if (numItems == 0) {
+				for (int i = 0; i <= p.numItems; i++) {
+					if (p.children[i].items[0] == null && i != 0)
+						x = p.children[i - 1];
+				}
+			}
+			return x;
+		}
 	}
-
-}
-
-public class TwoFourTree {
 	
 	private Node root = new Node();
 
