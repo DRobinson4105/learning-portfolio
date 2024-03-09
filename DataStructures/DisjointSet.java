@@ -13,13 +13,14 @@ public class DisjointSet {
     }
 
     // Merges the sets containing a and b
-    public void merge(int a, int b) {
+    public boolean merge(int a, int b) {
         int p1 = find(a);
         int p2 = find(b);
         
-        if (p1 == p2) return;
+        if (p1 == p2) return false;
 
         arr[p1] += arr[p2];
         arr[p2] = p1;
+        return true;
     }
 };
