@@ -55,8 +55,6 @@ public class NetworkFlow {
         }
     }
 
-
-
     static class Dinic {
         static class Edge {
             int v1, v2, cap, flow;
