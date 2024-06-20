@@ -5,6 +5,5 @@
 in
 out
 test.*
-venv
 __pycache__
 Test.*
