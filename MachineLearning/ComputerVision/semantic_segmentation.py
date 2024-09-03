@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import torch.nn as nn
 from tqdm.auto import tqdm as notebook_tqdm
 from torchvision.datasets import VOCSegmentation
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from torchvision import transforms
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
@@ -117,7 +117,7 @@ class AugmentData:
             image = TF.hflip(image)
             target = TF.hflip(target)
 
-        # rotate = torch.rand(1).item() * 360 // 90 * 90
+        # rotate = torch.rand(1).item() * 20 - 10
         # image = TF.rotate(image.unsqueeze(0), rotate).squeeze(0)
         # target = TF.rotate(target.unsqueeze(0), rotate).squeeze(0)
 
@@ -179,15 +179,18 @@ if __name__ == "__main__":
     BATCH_SIZE = 16
     LEARNING_RATE = 1e-4
     EXTRA_TRANSFORMS = AugmentData()
-    idx = 1
+    idx = 4
 
     print("Loading datasets...")
 
-    train_dataset = CustomVOCDataset('./data', "2012", image_set='train', download=True, extra_transforms=EXTRA_TRANSFORMS)
-    test_dataset = CustomVOCDataset('./data', "2012", image_set='val', download=True, extra_transforms=EXTRA_TRANSFORMS)
+    dataset = CustomVOCDataset('./data', "2012", image_set='trainval', download=True, extra_transforms=EXTRA_TRANSFORMS)
+    train_size = int(0.8 * len(dataset))
+    val_size = len(dataset) - train_size
+    
+    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
     train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+    test_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     print("Creating class weights for loss...")
 
