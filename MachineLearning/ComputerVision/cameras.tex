@@ -1,0 +1,93 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Camera Model and Calibration}
+\author{David Robinson}
+\date{}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+\maketitle
+
+\section*{Applications}
+\subsection*{Object Transfer}
+Transfer an object from one image or video to another. For example, inserting a person and their shadow from one video to another.
+
+\subsection*{Pose Estimation}
+Given a 3D model of an object and its image (2D projection), determine the location and orientation (translation and rotation) of the object, such that when projected on the image plane, it will match the image.
+
+\section*{Transformations}
+\subsection*{3D Translation}
+\[\begin{bmatrix}
+    X_2 \\ Y_2 \\ Z_2
+\end{bmatrix} = \begin{bmatrix}
+    X_1 \\ Y_1 \\ Z_1
+\end{bmatrix} + \begin{bmatrix}
+    d_x \\ d_y \\ d_z
+\end{bmatrix}\]
+
+\[\begin{bmatrix}
+    X_2 \\ Y_2 \\ Z_2 \\ 1
+\end{bmatrix} = T \begin{bmatrix}
+    X_1 \\ Y_1 \\ Z_1 \\ 1
+\end{bmatrix}\] where $T=\begin{bmatrix}
+    1 & 0 & 0 & d_x \\
+    0 & 1 & 0 & d_y \\
+    0 & 0 & 1 & d_z \\
+    0 & 0 & 0 & 1
+\end{bmatrix}$ is the translation matrix
+
+\subsection*{Scaling}
+\[\begin{bmatrix}
+    X_2 \\ Y_2 \\ Z_2
+\end{bmatrix} = \begin{bmatrix}
+    X_1 \times S_x \\ Y_1 \times S_y \\ Z_1 \times S_z
+\end{bmatrix}\]
+
+\[\begin{bmatrix}
+    X_2 \\ Y_2 \\ Z_2 \\ 1
+\end{bmatrix} = S \begin{bmatrix}
+    X_1 \\ Y_1 \\ Z_1 \\ 1
+\end{bmatrix}\] where $S=\begin{bmatrix}
+    S_x & 0 & 0 & 0 \\
+    0 & S_y & 0 & 0 \\
+    0 & 0 & S_z & 0 \\
+    0 & 0 & 0 & 1
+\end{bmatrix}$ is the scaling matrix
+
+\subsection*{Rotation}
+Rotation matrices are orthonormal matrices, so the inverse and transpose of a rotation matrix are equal.
+\[r_i \cdot r_j = \begin{cases}
+    1 & \text{if } i = j \\
+    0 & \text{otherwise}
+\end{cases}\] where $r_i$ and $r_j$ are rows in the rotation matrix.
+
+\vspace{1em}
+
+\subsubsection*{Rotation around $Z$ axis:}
+\[\begin{bmatrix}
+    X_2 \\ Y_2 \\ Z_2
+\end{bmatrix} = R \begin{bmatrix}
+    X_1 \\ Y_1 \\ Z_1
+\end{bmatrix}\] where $R=\begin{bmatrix}
+    \cos\theta & -\sin\theta & 0 \\
+    \sin\theta & \cos\theta & 0 \\
+    0 & 0 & 1
+\end{bmatrix}$ is the rotation matrix
+
+\subsubsection*{Rotation around an arbitrary axis:}
+\[R=R_Z^\alpha R_Y^\beta R_Z^\gamma=\begin{bmatrix}
+    \cos\alpha\cos\beta & \cos\alpha\sin\beta\sin\gamma - \sin\alpha\cos\gamma & \cos\alpha\sin\beta\cos\gamma + \sin\alpha\sin\gamma \\
+    \sin\alpha\cos\beta & \sin\alpha\sin\beta\sin\gamma + \cos\alpha\cos\gamma & \sin\alpha\sin\beta\cos\gamma - \cos\alpha\sin\gamma \\
+    -\sin\beta & \cos\beta\sin\gamma & \cos\beta\cos\gamma
+\end{bmatrix}\]
+
+The approximation if angles are small ($\cos\theta \approx 1$) is:
+\[\begin{bmatrix}
+    1 & -\alpha & \beta \\
+    \alpha & 1 & -\gamma \\
+    -\beta
+\end{bmatrix}\]
+
+\end{document}
