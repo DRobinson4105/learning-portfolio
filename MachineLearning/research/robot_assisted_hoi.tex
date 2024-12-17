@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{ulem}
+
+\definecolor{darkblue}{rgb}{0, 0, 20}
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=darkblue,
+    linkcolor=blue,
+    filecolor=magenta,
+    citecolor=blue,
+}
+
+\title{Real-Time Dynamic Robot-Assisted Hand-Object Interaction via Motion Primitives}
+\author{Mingqi Yuan, Huijiang Wang, Kai-Fung Chu, \\ Fumiya Iida, Bo Li, Wenjun Zeng}
+\date{}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}\textbf{\href{https://arxiv.org/pdf/2405.19531}{Paper}}\end{center}
+
+This paper proposes a new method of dynamic robot-assisted hand-object interaction using hand pose estimation, adaptive robot control, and motion primitives. This method includes a transformer-based algorithm to 3D model the human hands from single-view RGB images, with a motion primitives model to translate human hand motions into robotic actions.
+
+\section*{Motivation}
+
+There are current challenges in physical human-robot interaction, such as accurate real-time human motion perception, adaptive robot control, and effective human-robot. This paper introduces a system to improve robot assistance in tasks that require fine-grained physical collaboration.
+
+\section*{Architecture}
+
+\subsubsection*{3D Hand Pose Sensing}
+
+The system first estimates the 3D hand pose from a single RGB image using a transformer-based model, MeshGraphormer. A moving average filter smooths oscillations in hand pose data caused by detection noise.
+
+\subsubsection*{Motion Primitives Model (MPM)}
+
+A bidirectional LSTM processes time-series data of 3D hand joint coordinates to retain temporal context, and then map dynamic hand motions to predefined robotic actions, such as moving forward or grasping.
+
+\subsubsection*{Robot Controller}
+
+The system lastly integrates open-loop control for both predefined actions with closed-loop control for dynamic, adaptive responses. Open-loop control executes predefined motions when motion primitives are detected, while closed-loop control continuously adjusts the tobot's tool center point (TCP) based on real-time feedback.
+
+\section*{Limitations}
+
+\begin{enumerate}
+    \item The system is trained on predefined motions and specific tasks.
+    \item The system has not been tested with various environments or complex objects.
+\end{enumerate}
+
+\end{document}

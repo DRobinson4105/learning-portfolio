@@ -1,0 +1,43 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{ulem}
+
+\definecolor{darkblue}{rgb}{0, 0, 20}
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=darkblue,
+    linkcolor=blue,
+    filecolor=magenta,
+    citecolor=blue,
+}
+
+\title{How2Sign:\@ A Large-scale Multimodal Dataset for Continuous American Sign Language}
+\author{\textbf{\href{https://arxiv.org/pdf/2008.08143}{Paper}}}
+\date{}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\maketitle
+
+Contains:
+\begin{enumerate}
+    \item Green screen studio RGB videos
+    \item Green screen studio RGB-D videos
+    \item Body-face-hands 2D keypoints (Multiple views)
+    \item Panoptic studio data (Subset of dataset containing multi-view VGA/HD videos and 3D keypoint estimation)
+\end{enumerate}
+
+The RGB-D videos, 2D keypoints, and 3D keypoints, can each be used to form frames of 3D keypoints.
+\begin{enumerate}
+    \item 2D pose estimation can be applied to the RGB-D videos and the depth values can be used to lift the 2D keypoints to 3D.
+    \item The 2D keypoints can be retrieved from the front-facing 2D keypoint video and the side-facing 2D keypoint video can be used to determine the depth values.
+    \item The 3D keypoints are already provided for a subset of the dataset.
+\end{enumerate}
+
+The dataset of 3D keypoint frames can be split by ASL sign and a transformer-based model can be designed to learn the ASL language, converting ASL Gloss (or English) tokens into frames of ASL signs as 3D pose keypoints.
+
+\end{document}
