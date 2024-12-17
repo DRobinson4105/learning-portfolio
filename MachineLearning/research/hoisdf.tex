@@ -1,8 +1,14 @@
+% chktex-file 13
+
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{xcolor}
 \usepackage{ulem}
+\usepackage{graphicx}
+\usepackage[margin=0.75in]{geometry}
+
+\graphicspath{ {./images/} }
 
 \definecolor{darkblue}{rgb}{0, 0, 20}
 
@@ -15,7 +21,7 @@
 }
 
 \title{HOISDF:\@ Constraining 3D Hand-Object Pose Estimation with Global Signed Distance Fields}
-\author{\textbf{\href{https://arxiv.org/pdf/2402.17062}{Paper}}}
+\author{Haozhe Qi, Chen Zhao, Mathieu Salzmann, Alexander Mathis}
 \date{}
 \setlength{\parindent}{0pt}
 
@@ -23,9 +29,15 @@
 
 \maketitle
 
+\begin{center}\textbf{Accepted for CVPR 2024 (\href{https://arxiv.org/pdf/2402.17062}{Paper}) (\href{https://github.com/amathislab/HOISDF}{GitHub})}\end{center}
+
 The HOISDF model estimates signed distance fields for both the hand and object to build the shape
 of each with sampled points. The sample points on the surface are then used to predict hand joints
 and shape, as well as object rotation and translation.
+
+\begin{center}
+    \includegraphics[scale=0.4]{hoisdf-1.png}
+\end{center}
 
 \section*{Motivation}
 This model encodes the hand shape as a continuous function instead of a surface mesh with
@@ -33,7 +45,11 @@ predefined vertices and edges. Also, since the pose keypoints are determined fro
 distance field, you have more freedom around the keypoint prediction by modifying the signed
 distance field decoder, such as joint or collision constraints.
 
-\section*{Architecture}
+\begin{center}
+    \includegraphics[scale=0.4]{hoisdf-2.png}
+\end{center}
+
+\section*{Method}
 
 \subsubsection*{Global Signed Distance Field Learning}
 \begin{enumerate}
@@ -85,15 +101,20 @@ distance field decoder, such as joint or collision constraints.
     object features.
 \end{enumerate}
 
+\begin{center}
+    \includegraphics[scale=0.3]{hoisdf-3.png}
+\end{center}
+
 \section*{Limitations}
 
 \begin{enumerate}
     \item The paper explicitly states that the hand and object meshes might intersect with each
-    other in severely occluded scenarios. Include a weighted loss value for mesh intersections in the SDF decoder with SDF learning.
+    other in severely occluded scenarios. A possible solution is to include a weighted loss value for mesh intersections in the SDF decoder with SDF learning.
     \[L_\text{overlap}=\frac{1}{N}\sum_{p\in P} \text{ReLU}(-\text{SDF}_\text{hand}(p))\cdot \text{ReLU}(-\text{SDF}_\text{object}(p))\]
     \item The two datasets this model was trained on only include objects that are bigger than the
-    hand, which won't work with small cubes like in the Box and Block Test. Resolving this requires a dataset of hand-object interaction with unit cubes.
+    hand, which are much less occluded than smaller objects.
 \end{enumerate}
+
 \subsubsection*{Enhancements}
 \begin{enumerate}
     \item Train a separate temporal transformer encoder module that will receive the keypoint predictions for the video once all of the frames have been calculated and then shifts the keypoints to ensure smooth and consistent transitions.
