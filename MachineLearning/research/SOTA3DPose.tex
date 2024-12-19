@@ -65,6 +65,32 @@
     \item Motivation: Direct lifting methods do not utilize 3D intermediate representations and rely on the network to learn the mapping from 2D image to 3D pose. Coarse-to-fine methods make initial predictions and then refine them with explicit intermediate representations, such as hand joints or vertices, but require more computation and is not as precise as implicit intermediate representations, such as a signed distance field as a continuous function. Also, current signed distance field applications mainly use them to directly reconstruct 3D meshes instead of as an intermediate representation.
     \item Method: This method estiamtes signed distance field for both the hand and object to build the shape of each. The 3D space is split into many bins, each with a query point, and the ones on the surface, which have the lowest distance to the surface, are then used to extract hand and object features. These features are enhanced with multi head self-attention layers and then used to compute the 3D hand joints and mesh, as well as the object rotation and translation vectors. Each joint's 3D position is fine-tuned with the distance vectors from each nearby query point.
     \item Limitations: The hand and object meshes might intersect with each other in severely occluded scenarios. Also, this model was only trained on objects that are bigger than the hand, which are much less occluded than smaller objects.
+    \item Paper: https://arxiv.org/pdf/2402.17062
+    \item GitHub: https://github.com/amathislab/HOISDF
+\end{itemize}
+
+\section*{WildHands}
+
+\begin{itemize}
+    \item Conference: ECCV 2024
+    \item Authors: Aditya Prakash, Ruisen Tu, Matthew Chang, Saurabh Gupta
+    \item Hand or Body: Hand
+    \item Motivation:
+    \item Method:
+    \item Limitations:
+    \item Paper: https://arxiv.org/pdf/2312.06583
+    \item GitHub: https://github.com/ap229997/hands
 \end{itemize}
 
 \end{document}
+
+% \begin{itemize}
+%     \item Conference:
+%     \item Authors:
+%     \item Hand or Body:
+%     \item Motivation:
+%     \item Method:
+%     \item Limitations:
+%     \item Paper: 
+%     \item GitHub:
+% \end{itemize}
