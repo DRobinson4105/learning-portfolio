@@ -90,7 +90,7 @@
     \item Hand or Body: Body
     \item Motivation: Most previous methods lift 2D keypoints to 3D but it is not very accurate as one 2D detection may correspond to multiple 3D skeletons. Previous methods that process videos and extract temporal information, process the frames with a sliding-window that treats past and future frames equally, but a larger chunk size means relying on more future frames before inference, which increases inference latency.
     \item Method: This model is built off the RetNet architecture but with non-causal masking to incorporate future frames. They implement a chunkwise recurrent representation of RetNet, where the video sequence is split into chunks and the chunks are processed in parallel but the frames in the chunk are processed recurrently. This includes a cross-chunk state that tracks long-term features. Also, Rotary Position Encoding (RPE), a type of relative positional encoding, handles temporal relationships between frames in the attention mechanism of RetNet. They train on larger chunks to capture more temporal relationships but then transfer knowledge from large chunks to smaller chunks at inference to reduce latency.
-    \item Limitations: The theory behind the method's ability to trasnfer knowledge from large chunks to small chunks is unclear. Also, the method has only been tested for 2D-to-3D lifting.
+    \item Limitations: While, the paper examines the effect of the cross-chunk state in transferring knowledge, The theory behind how the method is able to transfer knowledge is unclear. Also, the method has only been tested for 2D-to-3D lifting and the method's application to other 3d pose estimation methods or sequential data tasks has not been explored.
     \item Paper: https://www.ecva.net/papers/eccv\_2024/papers\_ECCV/papers/04820.pdf
     \item GitHub: https://github.com/Kelly510/PoseRetNet
 \end{itemize}
@@ -101,11 +101,24 @@
     \item Conference: ECCV 2024
     \item Authors: Nermin Samet, Cédric Rommel, David Picard, Eduardo Valle
     \item Hand or Body: Hand and Body
-    \item Motivation:
-    \item Method:
-    \item Limitations:
+    \item Motivation: Current methods process all keypoints in a single network and are not designed to adapt to different scale and motion variance across body parts like hand, face, and main body. This is especially prevalent in videos or sequential frames where temporal constraints vary across different body parts.
+    \item Method: This method lifts 2D keypoints to 3D and processes the hands, face, and body with separate networks so each network can better adapt to that body part. Each network is a denoising diffusion probabilistic model (DDPM) to predict 3D pose from the 2D keypoints. The model starts with pure Gaussian noise and processes it with the 2D keypoints and the timestep to slowly denoise it at each step into the predicted 3D keypoints. The DDPMs process a temporal sliding window to ensure that temporal information is incorporated. During training, the model starts with the ground-truth 3D keypoints and adds noise at each timestep to teach the model how to reverse the noising process.
+    \item Limitations: The model was only trained and evaluated on the H3WB dataset as it was the only dataset to have 3D pose labels and sequential frames for temporal data. They did qualitatively evaluate the model in in-the-wild scenarios but the only quantitative data is from the H3WB dataset. Also, the frames in the H3WB dataset were irregularly sampled with large gaps so longer windows did not perform well but could on a consistently-sampled dataset.
     \item Paper: https://arxiv.org/pdf/2407.10220
     \item GitHub: https://github.com/valeoai/PAFUSE
+\end{itemize}
+
+\section*{TokenHMR: Advancing Human Mesh Recovery with a Tokenized Pose Representation}
+
+\begin{itemize}
+    \item Conference: CVPR 2024
+    \item Authors: Sai Kumar Dwivedi, Yu Sun, Priyanka Patel, Yao Feng, Michael J. Black
+    \item Hand or Body: Body
+    \item Motivation: 
+    \item Method:
+    \item Limitations:
+    \item Paper: https://arxiv.org/pdf/2402.17171
+    \item GitHub: https://github.com/saidwivedi/TokenHMR
 \end{itemize}
 
 \end{document}
