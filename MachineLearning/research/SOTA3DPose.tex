@@ -39,8 +39,8 @@
     \item Motivation: Existing graph methods in 3D hand pose estimation use static graphs which are unable to capture dynamic kinematic relations between joints in occluded scenarios. Also, self-occlusion and hand-object occlusion are major challenges for current methods.
     \item Method: The 3D hand point cloud and depth map are used to generate keypoint embeddings and determine a 3d point patch for each joint. The embeddings and patches are passed as queries and keys to an adaptive graph transformer, which dynamically balances local attention for visible keypoints and kinematic attention for occluded ones.
     \item Limitations: The model can't process interacting hands and focuses on single-hand samples. Also, this method requires redundant computation due to the 2D feature extraction. They state that possible solutions include bidirectional learning and developing a lightweight 2D model.
-    \item Paper: https://arxiv.org/pdf/2407.20542
-    \item GitHub: https://github.com/cwc1260/HandDAGT
+    \item Paper: \url{https://arxiv.org/pdf/2407.20542}
+    \item GitHub: \url{https://github.com/cwc1260/HandDAGT}
 \end{itemize}
 
 \section*{HandDiff}
@@ -52,8 +52,8 @@
     \item Motivation: Depth image-based methods either use 2D CNN-based approaches, which do not accurately capture the 3D structure, or 3D CNN-based approaches, which require large amounts of memory and computation. More recently, PointNet-based methods that process the 3D point cloud use a sparse point cloud to reduce computation at the cost of performance. Previous diffusion-based models rely on global features and overlook local details. Also, they are permutation-equivariant, which limits their ability to distinguish between joints.
     \item Method: The depth map and 3D point cloud are processed separately to generate 2D and 3D features. They are then concatenated and passed through three layers of BIL to generate joint-wise embeddings. The denoiser starts with a randomly sampled set of joint coordinates from a Gaussian distribution, and then for each time step out of a set amount, the denoiser samples local features around each joint and refines the joint coordinates using a kinematic-aware GCN.
     \item Limitations: The model can't process interacting hands and focuses on single-hand samples. Also, the denoiser's performance plateaus after around 5 timesteps.
-    \item Paper: https://arxiv.org/pdf/2404.03159
-    \item GitHub: https://github.com/cwc1260/HandDiff
+    \item Paper: \url{https://arxiv.org/pdf/2404.03159}
+    \item GitHub: \url{https://github.com/cwc1260/HandDiff}
 \end{itemize}
 
 \section*{HOISDF}
@@ -65,8 +65,8 @@
     \item Motivation: Direct lifting methods do not utilize 3D intermediate representations and rely on the network to learn the mapping from 2D image to 3D pose. Coarse-to-fine methods make initial predictions and then refine them with explicit intermediate representations, such as hand joints or vertices, but require more computation and is not as precise as implicit intermediate representations, such as a signed distance field as a continuous function. Also, current signed distance field applications mainly use them to directly reconstruct 3D meshes instead of as an intermediate representation.
     \item Method: This method estimates signed distance field for both the hand and object to build the shape of each. The 3D space is split into many bins, each with a query point, and the ones on the surface, which have the lowest distance to the surface, are then used to extract hand and object features. These features are enhanced with multi head self-attention layers and then used to compute the 3D hand joints and mesh, as well as the object rotation and translation vectors. Each joint's 3D position is fine-tuned with the distance vectors from each nearby query point.
     \item Limitations: The hand and object meshes might intersect with each other in severely occluded scenarios. Also, this model was only trained on objects that are bigger than the hand, which are much less occluded than smaller objects.
-    \item Paper: https://arxiv.org/pdf/2402.17062
-    \item GitHub: https://github.com/amathislab/HOISDF
+    \item Paper: \url{https://arxiv.org/pdf/2402.17062}
+    \item GitHub: \url{https://github.com/amathislab/HOISDF}
 \end{itemize}
 
 \section*{WildHands}
@@ -78,8 +78,8 @@
     \item Motivation: No existing method performs well in egocentric views as the perspective is distorted and there is a lack of 3D annotatins on the wild.
     \item Method: The model starts with cropped hand images and camera intrinsic parameters and mitigates the perspective distortion by encoding the hand's position in the camera's field of view with sinusoidal functions. The encodings are then passed through convolutional layers and a 1-layer MLP to generate a feature vector. The MANO parameters are initialized at 0 and then each of the parameters are passed through a 3-layer MLP with the feature vector and then added back to the parameters, three times. The result is the final MANO prediction.
     \item Limitations: The model does not perform well on images where the fingers are barely visible or contain complex poses. The KPE encoding requires camera intrinsic parameters. Also, they manually set hyperparameters for loss term weights.
-    \item Paper: https://arxiv.org/pdf/2312.06583
-    \item GitHub: https://github.com/ap229997/hands
+    \item Paper: \url{https://arxiv.org/pdf/2312.06583}
+    \item GitHub: \url{https://github.com/ap229997/hands}
 \end{itemize}
 
 \section*{NC-RetNet}
@@ -91,8 +91,8 @@
     \item Motivation: Most previous methods lift 2D keypoints to 3D but it is not very accurate as one 2D detection may correspond to multiple 3D skeletons. Previous methods that process videos and extract temporal information, process the frames with a sliding-window that treats past and future frames equally, but a larger chunk size means relying on more future frames before inference, which increases inference latency.
     \item Method: This model is built off the RetNet architecture but with non-causal masking to incorporate future frames. They implement a chunkwise recurrent representation of RetNet, where the video sequence is split into chunks and the chunks are processed in parallel but the frames in the chunk are processed recurrently. This includes a cross-chunk state that tracks long-term features. Also, Rotary Position Encoding (RPE), a type of relative positional encoding, handles temporal relationships between frames in the attention mechanism of RetNet. They train on larger chunks to capture more temporal relationships but then transfer knowledge from large chunks to smaller chunks at inference to reduce latency.
     \item Limitations: While, the paper examines the effect of the cross-chunk state in transferring knowledge, The theory behind how the method is able to transfer knowledge is unclear. Also, the method has only been tested for 2D-to-3D lifting and the method's application to other 3d pose estimation methods or sequential data tasks has not been explored.
-    \item Paper: https://www.ecva.net/papers/eccv\_2024/papers\_ECCV/papers/04820.pdf
-    \item GitHub: https://github.com/Kelly510/PoseRetNet
+    \item Paper: \url{https://www.ecva.net/papers/eccv_2024/papers_ECCV/papers/04820.pdf}
+    \item GitHub: \url{https://github.com/Kelly510/PoseRetNet}
 \end{itemize}
 
 \section*{PAFUSE}
@@ -104,8 +104,8 @@
     \item Motivation: Current methods process all keypoints in a single network and are not designed to adapt to different scale and motion variance across body parts like hand, face, and main body. This is especially prevalent in videos or sequential frames where temporal constraints vary across different body parts.
     \item Method: This method lifts 2D keypoints to 3D and processes the hands, face, and body with separate networks so each network can better adapt to that body part. Each network is a denoising diffusion probabilistic model (DDPM) to predict 3D pose from the 2D keypoints. The model starts with pure Gaussian noise and processes it with the 2D keypoints and the timestep to slowly denoise it at each step into the predicted 3D keypoints. The DDPMs process a temporal sliding window to ensure that temporal information is incorporated. During training, the model starts with the ground-truth 3D keypoints and adds noise at each timestep to teach the model how to reverse the noising process.
     \item Limitations: The model was only trained and evaluated on the H3WB dataset as it was the only dataset to have 3D pose labels and sequential frames for temporal data. They did qualitatively evaluate the model in in-the-wild scenarios but the only quantitative data is from the H3WB dataset. Also, the frames in the H3WB dataset were irregularly sampled with large gaps so longer windows did not perform well but could on a consistently-sampled dataset.
-    \item Paper: https://arxiv.org/pdf/2407.10220
-    \item GitHub: https://github.com/valeoai/PAFUSE
+    \item Paper: \url{https://arxiv.org/pdf/2407.10220}
+    \item GitHub: \url{https://github.com/valeoai/PAFUSE}
 \end{itemize}
 
 \section*{TokenHMR: Advancing Human Mesh Recovery with a Tokenized Pose Representation}
@@ -114,11 +114,24 @@
     \item Conference: CVPR 2024
     \item Authors: Sai Kumar Dwivedi, Yu Sun, Priyanka Patel, Yao Feng, Michael J. Black
     \item Hand or Body: Body
-    \item Motivation: 
-    \item Method:
-    \item Limitations:
-    \item Paper: https://arxiv.org/pdf/2402.17171
-    \item GitHub: https://github.com/saidwivedi/TokenHMR
+    \item Motivation: Current models are only able to either align the pose with the image or determine accurate 3D pose coordinates. The more accurate the method is at fitting 2D keypoints, the less accurate it is at predicting 3D pose, and vice versa. They determined the problem to be inaccurate camera parameters and biases in pseudo-ground truth datasets, which results in the detected 2D pose and the projected 3D joints not aligning.
+    \item Method: They first introduce a loss function that penalizes large 2D and p-GT errors while minimally penalizing smaller ones, to reduce overfitting. Also, they discretize the human poses using Vector Quantized-VAE to convert pose estimation from continuous regression to token classification, which restricts predictions to valid poses.
+    \item Limitations: The discretization of pose lowered the loss of 3D accuracy by about 2.5 mm.
+    \item Paper: \url{https://arxiv.org/pdf/2402.17171}
+    \item GitHub: \url{https://github.com/saidwivedi/TokenHMR}
+\end{itemize}
+
+\section*{Person-in-WiFi 3D: End-to-End Multi-Person 3D Pose Estimation with Wi-Fi}
+
+\begin{itemize}
+    \item Conference: CVPR 2024
+    \item Authors: Kangwei Yan, Fei Wang, Bo Qian, Han Ding, Jinsong Han, Xing Wei
+    \item Hand or Body: Body
+    \item Motivation: Camera-based pose estimation rely on proper lighting conditions and field of view, and they struggle in severe occlusion scenarios. Wi-Fi methods perform well under occlusion and do not capture sensitive details, but there has not been a method for multi-person 3D pose estimation.
+    \item Method: Through the WiFi signals, Channel State Information (CSI) samples are collected, containing amplitude and phase distortions caused by human motion. A linear transformation is applied to denoise the CSI phases. The CSI samples are then split into tokens, which represent the subcarriers that are being sent between the devices. The tokens are embedded with spatial-temporal embeddings and processed through six Transformer encoder layers. The Pose decoder starts with 100 randomly initialized queries that each represents a hypothesis for a person's pose and contains three DETR layers. The pose is initialized from the most confident outputs of the encoder, and then passed through each DETR layer to be refined. The Refine Decoder performs the same as the Pose Decoder but starts on the high confident pose predictions from the Pose decoder rather than 100 randomly initialized queries and is meant for fine-tuning.
+    \item Limitations: The model is trained with annotations generated by the Azure Kinect SDK, which limits the performance upper bound. The method does not implement any cross-location generalization methods and is sensitive to spatial configurations and the environment. The dataset does not have diverse arm positions, which resulted with the arms having much lower accuracy, especially the hands.
+    \item Paper: \url{https://openaccess.thecvf.com/content/CVPR2024/papers/Yan_Person-in-WiFi_3D_End-to-End_Multi-Person_3D_Pose_Estimation_with_Wi-Fi_CVPR_2024_paper.pdf}
+    \item GitHub: \url{https://github.com/aiotgroup/Person-in-WiFi-3D-repo}
 \end{itemize}
 
 \end{document}
