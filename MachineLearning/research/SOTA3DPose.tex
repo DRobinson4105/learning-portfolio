@@ -119,7 +119,7 @@
     \item Motivation: Current models are only able to either align the pose with the image or determine accurate 3D pose coordinates. The more accurate the method is at fitting 2D keypoints, the less accurate it is at predicting 3D pose, and vice versa. They determined the problem to be inaccurate camera parameters and biases in pseudo-ground truth datasets, which results in the detected 2D pose and the projected 3D joints not aligning.
     \item Method: They first introduce a loss function that penalizes large 2D and p-GT errors while minimally penalizing smaller ones, to reduce overfitting. Also, they discretize the human poses using Vector Quantized-VAE to convert pose estimation from continuous regression to token classification, which restricts predictions to valid poses.
     \item Limitations: The discretization of pose lowered the loss of 3D accuracy by about 2.5 mm.
-    \item Paper: \url{https://arxiv.org/pdf/2402.17171}
+    \item Paper: \url{https://arxiv.org/pdf/2404.16752}
     \item GitHub: \url{https://github.com/saidwivedi/TokenHMR}
 \end{itemize}
 
