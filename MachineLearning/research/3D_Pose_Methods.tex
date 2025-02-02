@@ -1,5 +1,3 @@
-% chktex-file 13
-
 \documentclass{article}
 \usepackage{amsmath}
 \usepackage{hyperref}
@@ -46,7 +44,7 @@
     \item Hand or Body: Hand
     \item Input: 2D depth image and 3D hand point cloud
     \item Motivation: Depth image-based methods either use 2D CNN-based approaches, which do not accurately capture the 3D structure, or 3D CNN-based approaches, which require large amounts of memory and computation. More recently, PointNet-based methods that process the 3D point cloud use a sparse point cloud to reduce computation at the cost of performance. Previous diffusion-based models rely on global features and overlook local details. Also, they are permutation-equivariant, which limits their ability to distinguish between joints.
-    \item Method: The depth map and 3D point cloud are processed separately to generate 2D and 3D features. They are then concatenated and passed through a three-layer bias-induced layer (BIL) to generate joint-wise embeddings. The denoiser starts with a randomly sampled set of joint coordinates from a Gaussian distribution, and then for each time step out of a set amount, the denoiser samples local features around each joint and refines the joint coordinates using a kinematic-aware GCN.
+    \item Method: The depth map and 3D point cloud are processed separately to generate 2D and 3D features. They are then concatenated and passed through a three-layer bias-induced layer (BIL) to generate joint-wise embeddings. The denoiser starts with a randomly sampled set of joint coordinates from a Gaussian distribution, and then for each time step out of a set amount, the denoiser samples local features around each joint and refines the joint coordinates using a kinematic-aware GCN.\@
     \item Limitations: The model can't process interacting hands and focuses on single-hand samples. Also, the denoiser's performance plateaus after around 5 timesteps.
     \item Paper: \url{https://arxiv.org/pdf/2404.03159}
     \item GitHub: \url{https://github.com/cwc1260/HandDiff}
@@ -108,7 +106,7 @@
     \item GitHub: \url{https://github.com/valeoai/PAFUSE}
 \end{itemize}
 
-\section*{TokenHMR: Advancing Human Mesh Recovery with a Tokenized Pose Representation}
+\section*{TokenHMR\@: Advancing Human Mesh Recovery with a Tokenized Pose Representation}
 
 \begin{itemize}
     \item Conference: CVPR 2024
@@ -122,7 +120,7 @@
     \item GitHub: \url{https://github.com/saidwivedi/TokenHMR}
 \end{itemize}
 
-\section*{Person-in-WiFi 3D: End-to-End Multi-Person 3D Pose Estimation with Wi-Fi}
+\section*{Person-in-WiFi 3D\@: End-to-End Multi-Person 3D Pose Estimation with Wi-Fi}
 
 \begin{itemize}
     \item Conference: CVPR 2024
@@ -136,7 +134,7 @@
     \item GitHub: \url{https://github.com/aiotgroup/Person-in-WiFi-3D-repo}
 \end{itemize}
 
-\section*{RePOSE: 3D Human Pose Estimation via Spatio-Temporal Depth Relational Consistency}
+\section*{RePOSE\@: 3D Human Pose Estimation via Spatio-Temporal Depth Relational Consistency}
 
 \begin{itemize}
     \item Conference: ECCV 2024
@@ -151,14 +149,3 @@
 \end{itemize}
 
 \end{document}
-
-% \begin{itemize}
-%     \item Conference:
-%     \item Authors:
-%     \item Hand or Body:
-%     \item Motivation:
-%     \item Method:
-%     \item Limitations:
-%     \item Paper: 
-%     \item GitHub:
-% \end{itemize}
