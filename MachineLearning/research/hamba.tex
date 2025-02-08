@@ -40,7 +40,7 @@ The image is fed into a Vision Transformer backbone to extract a set amount of t
 The 2D hand joints are initially predicted by the Joint Regressor, which consists of stacked 2D Selective Scan (SS2D) blocks and an MLP head to regress the initial MANO parameters. The Joint Regressor first regresses the 3D joints and then projects them back to the 2D image plane with a predicted camera translation and a predefined focal length. The tokens are then aligned with the 2D joints with bilinear interpolation.
 
 \subsubsection*{Graph-guided State Space (GSS) Block}
-Bidrectional scans are performed over the sampled joint tokens to model both local and global join dependencies for hand mesh reconstruction, using a Semantic Graph Convolution Network (GCN) block. The relationships between hand joints are modeled with a GCN using a predefined graph structure based on the hand joint skeleton.
+Bidrectional scans are performed over the sampled joint tokens to model both local and global joint dependencies for hand mesh reconstruction, using a Semantic Graph Convolution Network (GCN) block. The relationships between hand joints are modeled with a GCN using a predefined graph structure based on the hand joint skeleton.
 
 \subsubsection*{Fusion Module}
 
