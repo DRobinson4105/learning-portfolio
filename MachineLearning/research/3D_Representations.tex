@@ -1,0 +1,121 @@
+% chktex-file 13
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{ulem}
+\usepackage{graphicx}
+\usepackage[margin=0.75in]{geometry}
+\usepackage[T1]{fontenc}
+
+\graphicspath{ {./images/} }
+
+\hypersetup{breaklinks=true}
+
+\definecolor{darkblue}{rgb}{0, 0, 20}
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=darkblue,
+    linkcolor=blue,
+    filecolor=magenta,
+    citecolor=blue,
+}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\section*{Occupancy Fields}
+An \textbf{occupancy field} is a function that represents whether a point in 3D space is inside, outside, or on the surface of an object where a higher value is inside the object.
+\[F(x,y,z):\mathbb{R}^3\rightarrow[0,1]\]
+
+\subsection*{Fourier Occupancy Field}
+
+\begin{itemize}
+    \item Conference: NeurIPS 2022
+    \item Authors: Qiao Feng, Yebin Liu, Yu-Kun Lai, Jingyu Yang, Kun Li
+    \item Paper: \url{https://arxiv.org/pdf/2206.02194}
+    \item GitHub: \url{https://github.com/fengq1a0/FOF}
+\end{itemize}
+
+Instead of storing full 3D occupancy values, the 3D object is represented as a 2D field and uses Fourier series expansion for the depth. The occupancy field $F(x,y,z)$ is converted into $H\times W$ 1D occupancy signals $f(z)$ along lines orthogonal to the 2D field.
+\[f(z)=\frac{a_0}{2}+\sum_{n=1}^N (a_n\cos(n\pi z)+b_n\sin(n\pi z))\]
+where $a$ and $b$ are the learnable coefficients that represent the 3D occupancy at a 2D location.
+\vspace{1em}
+
+The final Fourier Occupancy Field (FOF) is stored as a multi-channel 2D map with shape $H\times W\times (2N+1)$. Since FOF uses a 2D CNN to estimate the field, it loses fine details and edge information. Also, they mention that FOF cannot represent objects that are too thin, such as fingers.
+
+\subsection*{Diffusion-FOF}
+
+\begin{itemize}
+    \item Conference: CVPR 2024
+    \item Authors: Yuanzhen Li, Fei Luo, Chunxia Xiao
+    \item Paper: \href{\detokenize{https://openaccess.thecvf.com/content/CVPR2024/papers/Li_Diffusion-FOF_Single-View_Clothed_Human_Reconstruction_via_Diffusion-Based_Fourier_Occupancy_Field_CVPR_2024_paper.pdf}}{Paper}
+\end{itemize}
+
+\subsubsection*{Method}
+\begin{enumerate}
+    \item A \textbf{Siamese network training strategy} is used to train a deep neural network to estimate the back-view image from the front-view image and ensure style consistency between the views.
+    \item An initial \textbf{Fourier Occupancy Field} (FOF) is predicted from the image.
+    \item The method first applies a \textbf{Haar wavelet transform}, decomposing the FOF into four wavelet bands, representing the average of the source image, which captures the smooth global structure, and fine details in the vertical, horizontal, and diagonal directions.
+    \[\{A, V_1, V_2, V_3\}\in\mathbb{R}^{\frac{H}{2}\times\frac{W}{2}\times(2N+1)}\]
+    \item Since the initial FOF lacks fine details and thin objects, a \textbf{diffusion} model is trained to refine the FOF and enhance fine details such as fingers.
+    \item The Inverse Haar wavelet transform reconstructs the full FOF with the fine details from diffusion.
+    \item The FOF is transformed into occupancy values and the \textbf{Marching Cubes} algorithm generates the final polygonal 3D mesh from the values.
+\end{enumerate}
+
+
+\subsubsection*{Future Work}
+
+Instead of querying a distance from the SDF decoder, the hand and object pose features can be directly extracted from the Diffusion-FOF. SDF requires querying many points to build the surface, while FOF stores the whole field that can be directly used. Also, SDF only represents the closest surface to a query point, but Diffusion-FOF models the full volumetric occupancy field.
+
+\section*{Neural Radiance Fields}
+
+A neural radiance field takes in 5D coordinates, including the spatial location (x, y, z) and viewing direction ($\theta$, $\phi$), and outputs the view-dependent color and volume density at that point and view. The volume density represents how much light is accumulated at that point, where high density is more likely to be part of a solid object and a low density means the point is in free space. The volume density can also be thought of as the probability of a ray terminating at that point.
+
+\begin{itemize}
+    \item Conference: ECCV 2020
+    \item Authors: Ben Mildenhall, Pratul P. Srinivasan, Matthew Tancik, Jonathan T. Barron, Ravi Ramamoorthi, Ren Ng
+    \item Paper: \url{https://arxiv.org/pdf/2003.08934}
+    \item GitHub: \url{https://github.com/bmild/nerf}
+\end{itemize}
+
+\subsubsection*{Method}
+\begin{enumerate}
+    \item The camera intrinsic parameters are used to convert each 2D pixel coordinate from the image into the 3D coordinate in the world space.
+    \item A ray is created from the camera center to each of the 3D coordinates using the camera extrinsic parameters, and then a set of 3D coordinates are sampled along each camera ray.
+    \item Each 3D coordinate is passed through an 8-layer MLP to obtain the volume density and a feature vector. The feature vector is concatenated with the corresponding 2D viewing direction from the ray and passed through another fully connected layer to determine the color.
+    \item The model performs an initial pass with uniform sampling, but many of those points may fall in empty space which don't contribute to the final pixel value. The density values are used to build a probability distribution. An additional set of points are sampled from this distribution, where more points are sampled from regions with high density.
+    \item Before passing the coordinate into the MLP, a positional encoding is applied to map the coordinate into a higher dimensional space.
+    \[\gamma(p)=(\sin(2^0 \pi p), \cos(2^0 \pi p), \ldots, \sin(2^{L-1}\pi p), \cos(2^{L-1}\pi p))\]
+    where L is a hyperparameter.
+    \item For each ray, the final pixel color from the camera's perspective is computed as a weighted sum using the densities and colors from the sampled points, considering occlusions, transparency, and view-dependent effects.
+\end{enumerate}
+
+\pagebreak
+
+\section*{Hamba}
+
+\begin{itemize}
+    \item Conference: NeurIPS 2024
+    \item Authors: Haoye Dong, Aviral Chharia, Wenbo Gou, Francisco Vicente Carrasco, Fernando De la Torre
+    \item Paper: \url{https://arxiv.org/pdf/2407.09646}
+\end{itemize}
+
+\subsubsection*{Method}
+\begin{enumerate}
+    \item The image is fed into a Vision Transformer backbone to extract a set amount of tokens, which are then downsampled using convolution layers.
+    \item The Joint Regressor, a stack of 2D Selective Scan (SS2D) blocks and an MLP head, regresses 3D joints and projects them back to 2D with a predicted camera translation, and aligns tokens with bilinear interpolation.
+    \item A Graph-guided Bidirectional Scan (GBS) refines the joint tokens to model both local and global joint dependencies using a Graph Convolutional Network (GCN).
+    \item The GBS-refined tokens are passed through the Graph-guided State Space (GSS) block, which applies a state-space model to propogate joint features across spatial and temporal relationships to enforce joint relationships.
+    \item The GSS-refined tokens, global mean feature, which aggregates information across all tokens, and joint predictions are fused and passed to an MLP to regress the final MANO parameters.
+\end{enumerate}
+
+\subsubsection*{Future Work}
+
+A graph is defined where nodes represent hand joints and object keypoints and edges connecte spatially relevant points like bones and object surface relationships. Each node would contain the feature vector, consisting of positional encodings and image features, and initial depth estimates. The depth for visible keypoints are obtained using a depth estimation network, while occluded depths are predicted by passing the visible keypoints through an MLP. A Graph-guided Bidirectional Scan (GBS) refines the node features to model both local and global joint dependencies using the Graph Convolutional Network (GCN). Graph Attention applied to learn relationships within the hand (hand-to-hand edges) and across the hand-object interaction space (hand-to-object edges). The same would be applied for object nodes to generate object-internal and cross-field object features.
+
+\end{document}
