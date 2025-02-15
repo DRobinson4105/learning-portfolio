@@ -116,6 +116,21 @@ A neural radiance field takes in 5D coordinates, including the spatial location 
 
 \subsubsection*{Future Work}
 
-A graph is defined where nodes represent hand joints and object keypoints and edges connecte spatially relevant points like bones and object surface relationships. Each node would contain the feature vector, consisting of positional encodings and image features, and initial depth estimates. The depth for visible keypoints are obtained using a depth estimation network, while occluded depths are predicted by passing the visible keypoints through an MLP. A Graph-guided Bidirectional Scan (GBS) refines the node features to model both local and global joint dependencies using the Graph Convolutional Network (GCN). Graph Attention applied to learn relationships within the hand (hand-to-hand edges) and across the hand-object interaction space (hand-to-object edges). The same would be applied for object nodes to generate object-internal and cross-field object features.
+A graph is defined where nodes represent hand joints and object keypoints and edges connect spatially relevant points like bones and object surface relationships. Each node would contain the feature vector, consisting of positional encodings and image features, and initial depth estimates. The depth for visible keypoints are obtained using a depth estimation network, while occluded depths are predicted by passing the visible keypoints through a Graph Convolution. A Graph-guided Bidirectional Scan (GBS) refines the node features to model both local and global joint dependencies using the Graph Convolutional Network (GCN). Graph Attention applied to learn relationships within the hand (hand-to-hand edges) and across the hand-object interaction space (hand-to-object edges). The same would be applied for object nodes to generate object-internal and cross-field object features.
+
+\begin{enumerate}
+    \item \textbf{Graph Definition}
+    
+    Each node represents either a hand joint or an object keypoint. There are hand-to-hand edges that are predefined and follow the hand keypoint structure, object-to-object edges that are predifined and connect nearby object nodes, and hand-to-object edges that are learned and connect spatially neighboring hand and object nodes.
+
+    \item \textbf{Initial 3D Coordinate Prediction}
+    
+    The 2D keypoints from an off-the-shelf network are combined with the depth of visible keypoints from a depth estimation network. Visible keypoints are determined based on a threshold of the 2D keypoint confidence. A Unified GCN is used to propagate depth features from visible to occluded keypoints by aggregating spatially neighboring node information.
+
+    \item \textbf{Unified Graph-guided Bidirectional Scan}
+    
+    A backward scan refines the node features by incorporating global information, ensuring that occluded keypoints align with spatial relationships. The hand-object edges are dynamically adjusted through Graph Attention to improve structural consistency.
+
+\end{enumerate}
 
 \end{document}
