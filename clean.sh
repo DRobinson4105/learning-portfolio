@@ -1,0 +1,1 @@
+find . -type f \( -name "*.aux" -o -name "*.fdb_latexmk" -o -name "*.fls" -o -name "*.log" -o -name "*.synctex.gz" -o -name "*.out" -o -name "*.bbl" -o -name "*.bcf" -o -name "*.blg" -o -name "*.run.xml" -o -name "*.bbl-SAVE-ERROR" \) -delete

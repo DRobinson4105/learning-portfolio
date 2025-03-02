@@ -88,13 +88,13 @@ The global token mean, 2D joint locations, TS tokens, and GSS tokens, are concat
 \begin{enumerate}
     \item \textbf{Depth Estimation}
     
-    Pass the image through a depth estimation network to generate a 2D depth map of the image. The depth map is concatenated with the image before passing it to the ViT backbone.
+    Pass the image through a depth estimation network to generate a 2D depth map of the image. The depth map is fused with the features from the ViT backbone.
 
-    \item \textbf{Object Pose Estimation}
+    \item \textbf{Object Detection}
     
-    Instead of the 6D object pose keypoints, the ground truth labels are re-annotated to contain 8 3D keypoints that are predefined to best represent the surface for each object class.
-    \vspace{1em}
-
-    Two separate Hamba networks will be trained for hand and object reconstruction.
+    Instead of the 6D object pose keypoints, the ground truth labels are re-annotated to contain 16 3D keypoints that are predefined to best represent the surface for each object class. A U-Net model detects any objects in the image and if one is overlapping with the hand bounding box, then that object is used for hand-object interaction.
+    
+    \item \textbf{Hand-Object Interaction}
+    The image will be passed through the Object Detection model to find the relevant object and then the object pose regressor, similar to the existing Joints Regressor which is a stack of SS2D blocks and an MLP, will be used to sample object-relevant tokens from the token map. The existing GSS block will be duplicated for the hand and object tokens separately. Those hand and object tokens will also be concatenated and passed through another GCN and SS2D block, before being duplicated and fused with the SS2D output in the hand and object GSS blocks separately.
 \end{enumerate}
 \end{document}
