@@ -32,23 +32,47 @@
 
 \begin{center}\textbf{Accepted for ECCV 2024 (\href{https://arxiv.org/pdf/2407.16658}{Paper}) (\href{https://github.com/ExplainableML/EgoCVR}{GitHub})}\end{center}
 
-The authors resolve issues with the WebVid-CoVR-Test dataset, specifically most of the modification texts involve a color, shape, or object change which doesn't require temporal understanding, and that captions are only considered similar if they have a one word difference. Also, they introduce a training-free method that achieves stronger performance on their new evaluation dataset.
+The paper introduces EgoCVR, an evaluation benchmark for fine-grained CVR that focuses on temporal video understanding rather than object modifications. The authors also introduce a training-free method that combines LLM-based text refinement and visual filtering for composed video retrieval.
 
 \section*{Motivation}
 
-85\% of samples in the WebVid-CoVR-Test dataset focused on object-centered modifications, such as a color, shape, or object change, which doesn't require temporal understanding and only requires image-level understanding. Also, the WebVid-CoVR-Test dataset was created by searching for single-word differences in video captions, which does not properly evaluate the generalizability to different prompt formats.
+85\% of WebVid-CoVR-Test samples involve object-centered modifications, such as color or shape changes, which can be solved with image-based methods and do not require temporal understanding. Also, videos in the WebVid-CoVR-Test dataset were paired through single-word differences in video captions, which does not properly test models on diverse and complex modifications.
+
+\begin{center}
+    \includegraphics[scale=0.22]{egocvr-1.png}
+\end{center}
 
 \section*{Method}
 
 \subsection*{Evaluation Dataset}
 \begin{enumerate}
-    \item 1,250 long videos are taken from the Ego4D FHO dataset.
-    \item 155k annotated clips are extracted from the videos, ranging from 2 to 8 seconds.
-    \item The clips are filtered for temporal overlap, resulting in 9k distinct clips.
-    \item Pairs are manually identified from video clips in the same video, looking for similarity in captions, except for a single action or object change.
-    \item 
+    \item 155k annotated clips were extracted from 1,250 long videos in the Ego4D dataset.
+    \item The clips were filtered for temporal overlap, resulting in 9k distinct video clips.
+    \item Pairs were manually identified from video clips in the same video, looking for similarity in captions, specifically a single action or object change, with an emphasis on temporal modifications, resulting in 2,295 high-quality pairs.
+    \item GPT-4 was few-shot prompted to generate the modification text between the video pair.
+    \item The authors include similar video clips that were from the same long video and don't have the same action as the target as a distraction.
 \end{enumerate}
 
+\subsection*{TFR-CVR}
+\begin{enumerate}
+    \item The source video is captioned and then combined with the modification text using an LLM to generate a target video caption.
+    \item The target video caption is used to perform text-based retrieval.
+    \item The video database is filtered for visual similarities with the source video to ensure videos are both textually relevant and visually similar.
+\end{enumerate}
+
+\begin{center}
+    \includegraphics[scale=0.22]{egocvr-2.png}
+\end{center}
+
 \section*{Limitations}
+\begin{enumerate}
+    \item The benchmark does not include a training set.
+    \item The dataset only consists of egocentric videos and may not generalize well to third-person videos.
+    \item LLM-generated captions occasionally misrepresented the video content.
+\end{enumerate}
+
+\begin{center}
+    \includegraphics[scale=0.22]{egocvr-3.png}
+\end{center}
 
 \end{document}
