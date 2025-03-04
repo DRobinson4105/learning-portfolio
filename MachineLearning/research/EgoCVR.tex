@@ -1,0 +1,54 @@
+% chktex-file 8
+% chktex-file 13
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{ulem}
+\usepackage{graphicx}
+\usepackage[margin=0.75in]{geometry}
+
+\graphicspath{ {./images/} }
+
+\definecolor{darkblue}{rgb}{0, 0, 20}
+
+\hypersetup{
+    colorlinks=true,
+    urlcolor=darkblue,
+    linkcolor=blue,
+    filecolor=magenta,
+    citecolor=blue,
+}
+
+\title{EgoCVR: An Egocentric Benchmark for Fine-Grained Composed Video Retrieval}
+\author{Thomas Hummel, Shyamgopal Karthik, Mariana-Iuliana Georgescu, Zeynep Akata}
+\date{}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}\textbf{Accepted for ECCV 2024 (\href{https://arxiv.org/pdf/2407.16658}{Paper}) (\href{https://github.com/ExplainableML/EgoCVR}{GitHub})}\end{center}
+
+The authors resolve issues with the WebVid-CoVR-Test dataset, specifically most of the modification texts involve a color, shape, or object change which doesn't require temporal understanding, and that captions are only considered similar if they have a one word difference. Also, they introduce a training-free method that achieves stronger performance on their new evaluation dataset.
+
+\section*{Motivation}
+
+85\% of samples in the WebVid-CoVR-Test dataset focused on object-centered modifications, such as a color, shape, or object change, which doesn't require temporal understanding and only requires image-level understanding. Also, the WebVid-CoVR-Test dataset was created by searching for single-word differences in video captions, which does not properly evaluate the generalizability to different prompt formats.
+
+\section*{Method}
+
+\subsection*{Evaluation Dataset}
+\begin{enumerate}
+    \item 1,250 long videos are taken from the Ego4D FHO dataset.
+    \item 155k annotated clips are extracted from the videos, ranging from 2 to 8 seconds.
+    \item The clips are filtered for temporal overlap, resulting in 9k distinct clips.
+    \item Pairs are manually identified from video clips in the same video, looking for similarity in captions, except for a single action or object change.
+    \item 
+\end{enumerate}
+
+\section*{Limitations}
+
+\end{document}
