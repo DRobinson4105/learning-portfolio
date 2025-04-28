@@ -23,35 +23,22 @@
 
 \maketitle
 
-The Mamba model addresses the inefficiencies of Transformers, especially with long sequences. The
-paper introduces a new selective SSM where the SSM parameters are input-dependent, allowing the
-model to focus on relevant information.
+The Mamba model addresses the inefficiencies of Transformers, especially with long sequences. The paper introduces a new selective SSM where the SSM parameters are input-dependent, allowing the model to focus on relevant information.
 
 \section*{Motivation}
 
-SSMs use linear time and memory but because the parameters are predefined, it cannot perform
-content-based reasoning effectively. Transformers are able to perform content-based reasoning but
-do so in quadratic time and memory. Selective SSMs have the benefits of both with the linear time
-and memory from the SSM architecture but by modifying the SSM parameters during inference, the
-model can focus on relevant content.
+SSMs use linear time and memory but because the parameters are predefined, it cannot perform content-based reasoning effectively. Transformers are able to perform content-based reasoning but do so in quadratic time and memory. Selective SSMs have the benefits of both with the linear time and memory from the SSM architecture but by modifying the SSM parameters during inference, the model can focus on relevant content.
 
 \section*{Architecture}
 
 \subsubsection*{State Space Models (SSMs)}
 
-Similar to a recurrent neural network where each output is affected by previous information and the
-current input. However, each step contains a state matrix, $h_t$, which is affected by the previous
-state and the current input, $x_t$. This state, along with the current input, affects the current
-output, $y_t$. These are all done through matrix multiplications.
+Similar to a recurrent neural network where each output is affected by previous information and the current input. However, each step contains a state matrix, $h_t$, which is affected by the previous state and the current input, $x_t$. This state, along with the current input, affects the current output, $y_t$. These are all done through matrix multiplications.
 \[h_t = Ah_{t-1}+Bx_t\quad y_t = Ch_t + Dx_t\]
 
 \subsubsection*{Selection Mechanism}
 
-A variant of the state space model architecture where the SSM parameters are input-dependent, to
-focus on relevant information and disregard irrelevant data dynamically. This selective SSM
-architecture does not require attention or MLP blocks. The SSM architecture uses a convolution
-layer to determine how the input values affect each output value through the hidden state. This
-convolution layer includes learnable parameters, along with the learned matrices.
+A variant of the state space model architecture where the SSM parameters are input-dependent, to focus on relevant information and disregard irrelevant data dynamically. This selective SSM architecture does not require attention or MLP blocks. The SSM architecture uses a convolution layer to determine how the input values affect each output value through the hidden state. This convolution layer includes learnable parameters, along with the learned matrices.
 
 \section*{Limitations}
 

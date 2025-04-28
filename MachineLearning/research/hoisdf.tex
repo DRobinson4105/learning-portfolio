@@ -31,9 +31,7 @@
 
 \begin{center}\textbf{Accepted for CVPR 2024 (\href{https://arxiv.org/pdf/2402.17062}{Paper}) (\href{https://github.com/amathislab/HOISDF}{GitHub})}\end{center}
 
-The HOISDF model estimates signed distance fields for both the hand and object to build the shape
-of each with sampled points. The sample points on the surface are then used to predict hand joints
-and shape, as well as object rotation and translation.
+The HOISDF model estimates signed distance fields for both the hand and object to build the shape of each with sampled points. The sample points on the surface are then used to predict hand joints and shape, as well as object rotation and translation.
 
 \begin{center}
     \includegraphics[scale=0.4]{hoisdf-1.png}
@@ -52,50 +50,34 @@ This model encodes the hand shape as a continuous function instead of a surface 
 \begin{enumerate}
     \item \textbf{Image Feature Extraction}
     
-    A U-Net architecture extracts hand and object segmentation masks and 2D keypoint predictions
-    from the image.
+    A U-Net architecture extracts hand and object segmentation masks and 2D keypoint predictions from the image.
 
     \item \textbf{3D Signed Distance Field Learning}
     
-    The decoder part of the U-Net is then used to convert a 3D point into an image feature vector.
-    Fourier positional encoding is also incorporated to expand the 3D point to a larger space. The
-    3D point, image features, and positional encodings are passed through a fully connected neural
-    network to predict the signed distance to the hand or object surface with positive values for
-    outside of the hand and negative for inside.
+    The decoder part of the U-Net is then used to convert a 3D point into an image feature vector. Fourier positional encoding is also incorporated to expand the 3D point to a larger space. The 3D point, image features, and positional encodings are passed through a fully connected neural network to predict the signed distance to the hand or object surface with positive values for outside of the hand and negative for inside.
 \end{enumerate}
 
 \subsubsection*{Field-Guided Pose Regression}
 \begin{enumerate}
     \item \textbf{Field-informed Point Sampling}
     
-    The 3D space is split into uniform bins, each with a query point, and then the points are
-    filtered in the 2D space using the hand and object bounding boxes. The points are sorted using
-    their distances to the surface and the first set of points are kept.
+    The 3D space is split into uniform bins, each with a query point, and then the points are filtered in the 2D space using the hand and object bounding boxes. The points are sorted using their distances to the surface and the first set of points are kept.
     
     \item \textbf{Field-based Point Feature Augmentation}
     
-    For each query point, its volume density is calculated where a higher density is closer to the
-    surface, giving more importance to those points. This is concatenated with the features from
-    before to form the final query point feature vector.
+    For each query point, its volume density is calculated where a higher density is closer to the surface, giving more importance to those points. This is concatenated with the features from before to form the final query point feature vector.
 
     \item \textbf{Cross Fields Hand-Object Interaction}
     
-    The query points are passed through the other signed distance field so hand query points are
-    passed through object signed distance field and vice versa. We then repeat what we did before
-    but with these distances instead.
+    The query points are passed through the other signed distance field so hand query points are passed through object signed distance field and vice versa. We then repeat what we did before but with these distances instead.
 
     \item \textbf{Feature Enhancement with Point-wise Attention}
     
-    The final feature and cross-field feature vectors are passed through six multi head
-    self-attention layers to compute the enhanced point features.
+    The final feature and cross-field feature vectors are passed through six multi head self-attention layers to compute the enhanced point features.
 
     \item \textbf{Point-wise Pose Regression}
     
-    Cross attention layers are used with 17 learned hand pose queries to compute the 3D joint
-    angles and the 10D mano shape parameters. For each joint, distance vectors are created from
-    each nearby query point to the joint to fine-tune that joint’s 3D position. Since the object is
-    more rigid, the rotation and translation vectors can be directly regressed from the enhanced
-    object features.
+    Cross attention layers are used with 17 learned hand pose queries to compute the 3D joint angles and the 10D mano shape parameters. For each joint, distance vectors are created from each nearby query point to the joint to fine-tune that joint’s 3D position. Since the object is more rigid, the rotation and translation vectors can be directly regressed from the enhanced object features.
 \end{enumerate}
 
 \begin{center}
@@ -105,11 +87,9 @@ This model encodes the hand shape as a continuous function instead of a surface 
 \section*{Limitations}
 
 \begin{enumerate}
-    \item The paper explicitly states that the hand and object meshes might intersect with each
-    other in severely occluded scenarios. A possible solution is to include a weighted loss value for mesh intersections in the SDF decoder with SDF learning.
+    \item The paper explicitly states that the hand and object meshes might intersect with each other in severely occluded scenarios. A possible solution is to include a weighted loss value for mesh intersections in the SDF decoder with SDF learning.
     \[L_\text{overlap}=\frac{1}{N}\sum_{p\in P} \text{ReLU}(-\text{SDF}_\text{hand}(p))\cdot \text{ReLU}(-\text{SDF}_\text{object}(p))\]
-    \item The two datasets this model was trained on only include objects that are bigger than the
-    hand, which are much less occluded than smaller objects.
+    \item The two datasets this model was trained on only include objects that are bigger than the hand, which are much less occluded than smaller objects.
 \end{enumerate}
 
 \subsubsection*{Enhancements}
