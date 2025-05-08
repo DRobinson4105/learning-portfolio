@@ -1,21 +1,31 @@
 #include <iostream>
 #include <cstdlib>
+#include <numeric>
+#include <execution>
 
 using namespace std;
 
-double mse(vector<double> y_true, vector<double> y_pred) {
-    if (y_true.size() != y_pred.size()) {
-        throw;
-    }
-    double sum = 0;
-    int n = y_true.size();
+typedef function<unordered_map<string, double>(vector<double>, vector<double>)> gradient_function_t;
 
-    for (int i = 0; i < n; i++) {
-        sum += pow(fabs(y_true[i] - y_pred[i]), 2);
-    }
+class Model;
+class Tensor;
+class MSELoss;
+class Optimizer;
+void printMap(unordered_map<string, double> m);
+
+class Tensor {
+public:
+    vector<double> value;
+    Model* source;
+    gradient_function_t gradient_function;
+
+    Tensor(): value(vector<double>()), source(nullptr), gradient_function(NULL) {}
+
+    // Tensor(vector<double> value): value(value), source(nullptr), gradient_function(NULL) {}
     
-    return sum / y_true.size();
-}
+    Tensor(vector<double> value, Model* source, gradient_function_t gradient_function):
+        value(value), source(source), gradient_function(gradient_function) {}
+};
 
 class Dataset {
 public:
@@ -43,94 +53,160 @@ public:
     const pair<double, double> operator[](int index) {
         return {input[index], output[index]};
     }
+
+    int size() {
+        return input.size();
+    }
 };
 
-class Neuron {
+class Model {
 public:
-    double weight, bias;
+    unordered_map<string, double> parameters;
+    unordered_map<string, double> gradients;
 
-    Neuron() {
-        weight = bias = 0;
+    Model() {
+        parameters["weight"] = (double)rand() / RAND_MAX;
+        parameters["bias"] = (double)rand() / RAND_MAX;
     }
 
-    Neuron(int lo, int hi) {
-        weight = (double)rand() / RAND_MAX * (hi-lo) + lo;
-        bias = (double)rand() / RAND_MAX * (hi-lo) + lo;
-    }
-
-    vector<double> operator()(vector<double> input) {
+    Tensor operator()(vector<double> input) {
         vector<double> prediction(input.size());
-        transform(input.begin(), input.end(), prediction.begin(), [this](int x) {
-            return x * weight + bias;
+        transform(input.begin(), input.end(), prediction.begin(), [this](double x) {
+            return x * parameters["weight"] + parameters["bias"];
         });
-        return prediction;
+
+        // for (int i = 0; i < input.size(); i++) {
+        //     cout << input[i] << " " << prediction[i] << endl;
+        // }
+
+        return Tensor(prediction, this, [input](vector<double> y_pred, vector<double> y_true) {
+            unordered_map<string, double> grad;
+
+            // for (int i = 0; i < y_pred.size(); i++) {
+            //     cout << y_pred[i] << " " << y_true[i] << endl;
+            // }
+        
+            transform(y_pred.begin(), y_pred.end(), y_true.begin(), y_true.begin(), minus<>());
+
+            grad["bias"] = accumulate(y_true.begin(), y_true.end(), 0.0);
+            grad["weight"] = inner_product(y_true.begin(), y_true.end(), input.begin(), 0.0);
+
+            // printMap(grad);
+
+            // for (int i = 0; i < y_true.size(); i++) {
+            //     cout << y_true[i] << endl;
+            // }
+            // cout << endl;
+            // cout << grad["bias"] << " " << grad["weight"] << endl;
+            grad["bias"] *= 2.0 / input.size();
+            grad["weight"] *= 2.0 / input.size();
+
+            return grad;
+        });
+    }
+};
+
+class MSELoss {
+public:
+    double operator()(Tensor y_pred, vector<double> y_true) {
+        // for (int i = 0; i < y_pred.value.size(); i++) {
+        //     cout << y_pred.value[i] << " " << y_true[i] << endl;
+        // }
+        y_pred.source->gradients = y_pred.gradient_function(y_pred.value, y_true);
+        transform(y_pred.value.begin(), y_pred.value.end(), y_true.begin(), y_true.begin(), [](double a, double b) {
+            return pow(a - b, 2);
+        });
+
+        // for (double val : y_true) {
+        //     cout << val << endl;
+        // }
+
+        return accumulate(y_true.begin(), y_true.end(), 0.0) / y_pred.value.size();
     }
 };
 
 class Optimizer {
-public:
     int patience, epochs;
-    double lr, factor;
-    Neuron& model;
+    double lr, factor, best_loss;
+    Model& model;
     Dataset dataset;
 
-    Optimizer(Neuron& model, Dataset dataset, double lr, double factor, int patience):
-        model(model), dataset(dataset), lr(lr), factor(factor), patience(patience), epochs(0) {}
+public:
+    Optimizer(Model& model, Dataset dataset, double lr, double factor, int patience):
+        model(model), dataset(dataset), lr(lr), factor(factor), patience(patience), epochs(0), best_loss(pow(2, 1027)) {}
 
-    void step() {
-        double best_weight = 0, best_bias = 0, best_loss = pow(2, 1023);
-        double starting_weight = model.weight, starting_bias = model.bias;
-        double starting_loss = mse(dataset.output, model(dataset.input));
+    void step(double loss) {
+        unordered_map<string, double> grad = model.gradients;
 
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                model.weight = starting_weight + i * lr;
-                model.bias = starting_bias + j * lr;
-                double cur_loss = mse(dataset.output, model(dataset.input));
-                if (cur_loss < best_loss) {
-                    best_loss = cur_loss;
-                    best_weight = model.weight + i * cur_loss * lr;
-                    best_bias = model.bias + j * cur_loss * lr;
-                }
-            }
+        for (auto [k, v] : grad) {
+            model.parameters[k] -= lr * v;
         }
 
-        model.weight = best_weight;
-        model.bias = best_bias;
-
-        if (starting_loss == best_loss) {
+        // cout << best_loss << " " << epochs << " " << patience << " " << loss << " " << lr << endl;
+        if (loss < best_loss) {
+            best_loss = loss;
+            epochs = 0;
+        } else if (loss == best_loss) {
             epochs++;
         }
-
+        
         if (epochs >= patience) {
-            epochs = 0;
             lr *= factor;
+            epochs = 0;
         }
     }
 };
+
+void printMap(unordered_map<string, double> m) {
+    for (auto [k, v] : m) {
+        printf("[\"%s\"]=%lf\n", k.c_str(), v);
+    }
+}
 
 int main() {
     srand(56);
 
     Dataset data(0, 10, 3, 1);
 
+    // for (double d : data.output) {
+    //     cout << d << endl;
+    // }
+
     int epochs = 10000;
     double lr = 1e-3;
-    double factor = 0.9;
+    double factor = 1;
     int patience = 10;
 
-    Neuron model(-pow(2, 1027), pow(2, 1027));
+    Model model;
     Optimizer optim(model, data, lr, factor, patience);
+    MSELoss criterion;
+
+    Tensor y_pred;
+    double loss;
     
-    cout << model.weight << " " << model.bias << endl;
-    cout << mse(data.output, model(data.input)) << endl;
+    printf("Before Training:\n");
+    printf("Parameters\n");
+    printMap(model.parameters);
+    y_pred = model(data.input);
+    loss = criterion(y_pred, data.output);
+    printf("Gradients\n");
+    printMap(model.gradients);
+    printf("Loss: %lf\n\n", loss);
 
     for (int i = 0; i < epochs; i++) {
-        optim.step();
+        y_pred = model(data.input);
+        loss = criterion(y_pred, data.output);
+        optim.step(loss);
     }
 
-    cout << model.weight << " " << model.bias << endl;
-    cout << mse(data.output, model(data.input)) << endl;
-    
+    printf("After Training:\n");
+    printf("Parameters\n");
+    printMap(model.parameters);
+    y_pred = model(data.input);
+    loss = criterion(y_pred, data.output);
+    printf("Gradients\n");
+    printMap(model.gradients);
+    printf("Loss: %lf\n", loss);
+
     return 0;
 }
