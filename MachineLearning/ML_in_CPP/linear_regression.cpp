@@ -21,7 +21,7 @@ public:
 
     Tensor(): value(vector<double>()), source(nullptr), gradient_function(NULL) {}
 
-    // Tensor(vector<double> value): value(value), source(nullptr), gradient_function(NULL) {}
+    Tensor(vector<double> value): value(value), source(nullptr), gradient_function(NULL) {}
     
     Tensor(vector<double> value, Model* source, gradient_function_t gradient_function):
         value(value), source(source), gradient_function(gradient_function) {}
@@ -75,29 +75,14 @@ public:
             return x * parameters["weight"] + parameters["bias"];
         });
 
-        // for (int i = 0; i < input.size(); i++) {
-        //     cout << input[i] << " " << prediction[i] << endl;
-        // }
-
         return Tensor(prediction, this, [input](vector<double> y_pred, vector<double> y_true) {
             unordered_map<string, double> grad;
-
-            // for (int i = 0; i < y_pred.size(); i++) {
-            //     cout << y_pred[i] << " " << y_true[i] << endl;
-            // }
         
             transform(y_pred.begin(), y_pred.end(), y_true.begin(), y_true.begin(), minus<>());
 
             grad["bias"] = accumulate(y_true.begin(), y_true.end(), 0.0);
             grad["weight"] = inner_product(y_true.begin(), y_true.end(), input.begin(), 0.0);
 
-            // printMap(grad);
-
-            // for (int i = 0; i < y_true.size(); i++) {
-            //     cout << y_true[i] << endl;
-            // }
-            // cout << endl;
-            // cout << grad["bias"] << " " << grad["weight"] << endl;
             grad["bias"] *= 2.0 / input.size();
             grad["weight"] *= 2.0 / input.size();
 
@@ -109,17 +94,10 @@ public:
 class MSELoss {
 public:
     double operator()(Tensor y_pred, vector<double> y_true) {
-        // for (int i = 0; i < y_pred.value.size(); i++) {
-        //     cout << y_pred.value[i] << " " << y_true[i] << endl;
-        // }
         y_pred.source->gradients = y_pred.gradient_function(y_pred.value, y_true);
         transform(y_pred.value.begin(), y_pred.value.end(), y_true.begin(), y_true.begin(), [](double a, double b) {
             return pow(a - b, 2);
         });
-
-        // for (double val : y_true) {
-        //     cout << val << endl;
-        // }
 
         return accumulate(y_true.begin(), y_true.end(), 0.0) / y_pred.value.size();
     }
@@ -142,7 +120,6 @@ public:
             model.parameters[k] -= lr * v;
         }
 
-        // cout << best_loss << " " << epochs << " " << patience << " " << loss << " " << lr << endl;
         if (loss < best_loss) {
             best_loss = loss;
             epochs = 0;
@@ -167,10 +144,6 @@ int main() {
     srand(56);
 
     Dataset data(0, 10, 3, 1);
-
-    // for (double d : data.output) {
-    //     cout << d << endl;
-    // }
 
     int epochs = 10000;
     double lr = 1e-3;
