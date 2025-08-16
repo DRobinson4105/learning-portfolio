@@ -1,48 +1,31 @@
-#include <iostream>
-#include <cstdlib>
-#include <numeric>
-#include <execution>
-
-using namespace std;
-
-typedef function<unordered_map<string, double>(vector<double>, vector<double>)> gradient_function_t;
-
-class Model;
-class Tensor;
-class MSELoss;
-class Optimizer;
-void printMap(unordered_map<string, double> m);
+#include "linear_regression.hpp"
 
 class Tensor {
 public:
-    vector<double> value;
+    std::vector<double> value;
     Model* source;
     gradient_function_t gradient_function;
 
-    Tensor(): value(vector<double>()), source(nullptr), gradient_function(NULL) {}
+    Tensor(): value(std::vector<double>()), source(nullptr), gradient_function(nullptr) {}
 
-    Tensor(vector<double> value): value(value), source(nullptr), gradient_function(NULL) {}
+    Tensor(std::vector<double> value): value(value), source(nullptr), gradient_function(nullptr) {}
     
-    Tensor(vector<double> value, Model* source, gradient_function_t gradient_function):
+    Tensor(std::vector<double> value, Model* source, gradient_function_t gradient_function):
         value(value), source(source), gradient_function(gradient_function) {}
 };
 
 class Dataset {
 public:
-    vector<double> input;
-    vector<double> output;
+    std::vector<double> input;
+    std::vector<double> output;
 
     Dataset() {}
 
     Dataset(int start, int stop, double w, double b) {
-        if (start < 0 || start > stop) {
-            throw;
-        }
-    
         int n = stop - start;
 
-        input = vector<double>(n);
-        output = vector<double>(n);
+        input = std::vector<double>(n);
+        output = std::vector<double>(n);
 
         for (int i = 0; i < n; i++) {
             input[i] = i+start;
@@ -50,7 +33,7 @@ public:
         }
     }
 
-    const pair<double, double> operator[](int index) {
+    const std::pair<double, double> operator[](int index) {
         return {input[index], output[index]};
     }
 
@@ -61,27 +44,28 @@ public:
 
 class Model {
 public:
-    unordered_map<string, double> parameters;
-    unordered_map<string, double> gradients;
+    std::unordered_map<std::string, double> parameters;
+    std::unordered_map<std::string, double> gradients;
 
     Model() {
         parameters["weight"] = (double)rand() / RAND_MAX;
         parameters["bias"] = (double)rand() / RAND_MAX;
     }
 
-    Tensor operator()(vector<double> input) {
-        vector<double> prediction(input.size());
+    Tensor operator()(std::vector<double> input) {
+        std::vector<double> prediction(input.size());
         transform(input.begin(), input.end(), prediction.begin(), [this](double x) {
             return x * parameters["weight"] + parameters["bias"];
         });
 
-        return Tensor(prediction, this, [input](vector<double> y_pred, vector<double> y_true) {
-            unordered_map<string, double> grad;
-        
-            transform(y_pred.begin(), y_pred.end(), y_true.begin(), y_true.begin(), minus<>());
+        return Tensor(prediction, this, [input](std::vector<double> y_pred, std::vector<double> y_true) {
+            std::unordered_map<std::string, double> grad;
 
-            grad["bias"] = accumulate(y_true.begin(), y_true.end(), 0.0);
-            grad["weight"] = inner_product(y_true.begin(), y_true.end(), input.begin(), 0.0);
+            std::vector<double> diff(y_pred.size());
+            transform(y_pred.begin(), y_pred.end(), y_true.begin(), diff.begin(), std::minus<>());
+
+            grad["bias"] = accumulate(diff.begin(), diff.end(), 0.0);
+            grad["weight"] = inner_product(diff.begin(), diff.end(), input.begin(), 0.0);
 
             grad["bias"] *= 2.0 / input.size();
             grad["weight"] *= 2.0 / input.size();
@@ -93,13 +77,12 @@ public:
 
 class MSELoss {
 public:
-    double operator()(Tensor y_pred, vector<double> y_true) {
+    double operator()(Tensor y_pred, std::vector<double> y_true) {
         y_pred.source->gradients = y_pred.gradient_function(y_pred.value, y_true);
-        transform(y_pred.value.begin(), y_pred.value.end(), y_true.begin(), y_true.begin(), [](double a, double b) {
-            return pow(a - b, 2);
-        });
 
-        return accumulate(y_true.begin(), y_true.end(), 0.0) / y_pred.value.size();
+        return transform_reduce(y_pred.value.begin(), y_pred.value.end(), y_true.begin(), 0, std::plus<>(), [](double a, double b) {
+            return pow(a - b, 2);
+        }) / y_pred.value.size();
     }
 };
 
@@ -114,7 +97,7 @@ public:
         model(model), dataset(dataset), lr(lr), factor(factor), patience(patience), epochs(0), best_loss(pow(2, 1027)) {}
 
     void step(double loss) {
-        unordered_map<string, double> grad = model.gradients;
+        std::unordered_map<std::string, double> grad = model.gradients;
 
         for (auto [k, v] : grad) {
             model.parameters[k] -= lr * v;
@@ -134,14 +117,15 @@ public:
     }
 };
 
-void printMap(unordered_map<string, double> m) {
+void printMap(std::unordered_map<std::string, double> m) {
     for (auto [k, v] : m) {
         printf("[\"%s\"]=%lf\n", k.c_str(), v);
     }
 }
 
 int main() {
-    srand(56);
+    std::mt19937 gen(56);
+    std::uniform_real_distribution<> dist(0.0, 1.0);
 
     Dataset data(0, 10, 3, 1);
 
