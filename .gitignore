@@ -1,15 +1,32 @@
-.vscode
+.vscode/
 *.out
 *.in
 *.class
 in
 out
-test.*
-__pycache__
-Test.*
+__pycache__/
 *.aux
 *.fdb_latexmk
 *.fls
 *.log
 *.synctex.gz
 .venv
+.DS_Store
+
+# Houdini autosaves and renders
+backup/
+render/
+
+# Houdini caches and generated output (regenerate from the .hipnc)
+*.bgeo.sc
+*.vdb
+*.usdnc
+*.usdnc.volumes/
+*.filecache*/
+galleries/
+sim/
+checkpoint/
+pdgtemp/
+*.sim
+*.hperf
+*.debug.*.hip*
