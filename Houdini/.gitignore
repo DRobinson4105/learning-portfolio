@@ -1,0 +1,25 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Houdini autosaves and renders
+backup/
+render/
+
+# Houdini caches and generated output (regenerate from the .hipnc)
+*.bgeo.sc
+*.vdb
+*.usdnc
+*.usdnc.volumes/
+*.filecache*/
+galleries/
+sim/
+checkpoint/
+pdgtemp/
+*.sim
+*.hperf
+*.debug.*.hip*
+
+# Local history backup
+_git_backup/
